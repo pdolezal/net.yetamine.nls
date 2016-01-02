@@ -1,5 +1,7 @@
 package net.yetamine.nls;
 
+import java.text.ChoiceFormat;
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.function.Supplier;
@@ -13,9 +15,7 @@ import java.util.function.Supplier;
  * this approach is useful for occasional uses (for instance, when an exception
  * shall be thrown and the error message is resolved with a callback), it is not
  * very efficient for a sequence of resolutions. This scenario is supported with
- * {@link #resolve()} that returns a fully resolved instance; note it is the
- * only method that does return a resolved instance, others return always an
- * unresolved (lazy) instances.
+ * {@link #resolve()} that returns a fully resolved instance.
  */
 public interface ResourcePackage {
 
@@ -25,17 +25,6 @@ public interface ResourcePackage {
      * @return the name of this resource package
      */
     String name();
-
-    /**
-     * Returns a resource package with the same name for the specified locale.
-     *
-     * @param locale
-     *            the locale supplier to use. It must not be {@code null} and it
-     *            must return a valid locale.
-     *
-     * @return a resource package for the specified locale
-     */
-    ResourcePackage locale(Supplier<Locale> locale);
 
     /**
      * Returns a fully resolved resource package.
@@ -63,7 +52,21 @@ public interface ResourcePackage {
     ResourcePackage resolve();
 
     /**
-     * Returns a resource package with the same name for the specified locale.
+     * Returns an unresolved resource package with the same name, but using the
+     * specified locale supplier.
+     *
+     * @param locale
+     *            the locale supplier to use. It must not be {@code null} and it
+     *            must return a valid locale.
+     *
+     * @return a resource package for the specified locale
+     */
+    ResourcePackage locale(Supplier<Locale> locale);
+
+    /**
+     * Returns a resource package with the same name for the specified locale;
+     * if this instance is resolved and the locale is the same, the result is
+     * this instance, otherwise an unresolved instance is returned.
      *
      * @param locale
      *            the locale to use. It must not be {@code null}.
@@ -100,32 +103,115 @@ public interface ResourcePackage {
      * Constructs a template from a resource with the given name and returns the
      * template.
      *
+     * <p>
+     * The default implementation is based on {@link ChoiceFormat} while using
+     * {@link #string(String)} to load the formatting pattern.
+     *
      * @param name
      *            the name of the resource. It must not be {@code null}.
      *
      * @return the template
      */
-    DecimalTemplate decimal(String name);
+    default DecimalTemplate decimal(String name) {
+        return value -> new ChoiceFormat(string(name)).format(value);
+    }
 
     /**
      * Constructs a template from a resource with the given name and returns the
      * template.
      *
+     * <p>
+     * The default implementation is based on {@link ChoiceFormat} while using
+     * {@link #string(String)} to load the formatting pattern.
+     *
      * @param name
      *            the name of the resource. It must not be {@code null}.
      *
      * @return the template
      */
-    IntegralTemplate integral(String name);
+    default IntegralTemplate integral(String name) {
+        return value -> new ChoiceFormat(string(name)).format(value);
+    }
 
     /**
      * Constructs a template from a resource with the given name and returns the
      * template.
      *
+     * <p>
+     * The default implementation is based on {@link MessageFormat} while using
+     * {@link #string(String)} to load the formatting pattern.
+     *
      * @param name
      *            the name of the resource. It must not be {@code null}.
      *
      * @return the template
      */
-    MessageTemplate message(String name);
+    default MessageTemplate message(String name) {
+        return args -> MessageFormat.format(string(name), args);
+    }
+
+    /**
+     * A factory interface for {@link ResourcePackage}.
+     */
+    @FunctionalInterface
+    interface Factory {
+
+        /**
+         * Returns an unresolved {@link ResourcePackage} instance bound to the
+         * given name and locale supplier.
+         *
+         * @param name
+         *            the name of the package. It must not be {@code null}.
+         * @param locale
+         *            the locale supplier. It must not be {@code null} and it
+         *            must not return {@code null}.
+         *
+         * @return an unresolved instance bound to the specified parameters
+         */
+        ResourcePackage bind(String name, Supplier<Locale> locale);
+
+        /**
+         * Returns an unresolved {@link ResourcePackage} instance bound to the
+         * given name and locale.
+         *
+         * @param name
+         *            the name of the package. It must not be {@code null}.
+         * @param locale
+         *            the locale. It must not be {@code null}.
+         *
+         * @return an unresolved instance bound to the specified parameters
+         */
+        default ResourcePackage bind(String name, Locale locale) {
+            return bind(name, () -> locale);
+        }
+
+        /**
+         * Returns an unresolved {@link ResourcePackage} instance bound to the
+         * given name and using {@link Locale#getDefault()} as the locale
+         * supplier.
+         *
+         * @param name
+         *            the name of the package. It must not be {@code null}.
+         *
+         * @return an unresolved instance bound to the specified parameters
+         */
+        default ResourcePackage bind(String name) {
+            return bind(name, Locale::getDefault);
+        }
+
+        /**
+         * Returns a resolved {@link ResourcePackage} instance bound to the
+         * given name and locale.
+         *
+         * @param name
+         *            the name of the package. It must not be {@code null}.
+         * @param locale
+         *            the locale. It must not be {@code null}.
+         *
+         * @return a resolved instance bound to the specified parameters
+         */
+        default ResourcePackage resolve(String name, Locale locale) {
+            return bind(name, locale).resolve();
+        }
+    }
 }

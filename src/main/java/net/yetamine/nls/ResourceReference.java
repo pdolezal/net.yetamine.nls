@@ -21,7 +21,7 @@ public interface ResourceReference<T> {
      *
      * <pre>
      * enum Titles implements MessageTemplate.Reference {
-     *     MR, MRS, MISS, MS;
+     *     MR, MS, MRS, MISS;
      * }
      *
      * // Then, assuming 'resources' contain such resources, it is possible just
