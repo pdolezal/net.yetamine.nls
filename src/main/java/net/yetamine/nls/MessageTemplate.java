@@ -1,32 +1,50 @@
 package net.yetamine.nls;
 
-import java.util.function.Supplier;
+import java.util.Objects;
 
 /**
- * A representation of a formattable message template.
+ * A formatter of a message template.
  */
+@FunctionalInterface
 public interface MessageTemplate {
 
     /**
-     * Applies the given arguments on this template.
-     *
-     * @param args
-     *            the arguments to use for formatting
-     *
-     * @return the result of formatting this template
+     * Represents a reference to a resource with the given name that shall be
+     * resolved to a {@link MessageTemplate}.
      */
-    String apply(Object... args);
+    @FunctionalInterface
+    interface Reference extends ResourceReference<MessageTemplate> {
+
+        /**
+         * @see net.yetamine.nls.ResourceReference#from(net.yetamine.nls.ResourcePackage)
+         */
+        default MessageTemplate from(ResourcePackage resources) {
+            return resources.message(name());
+        }
+
+        /**
+         * Creates a new instance with the given name.
+         *
+         * @param name
+         *            the name of the resource. It must not be {@code null}.
+         *
+         * @return the new instance
+         */
+        static Reference to(String name) {
+            Objects.requireNonNull(name);
+            return () -> name;
+        }
+    }
 
     /**
-     * Returns a {@link Supplier} that executes {@link #apply(Object[])} on
-     * demand.
+     * Applies the given arguments on this template and returns the formatted
+     * text.
      *
      * @param args
-     *            the arguments to bind
+     *            the arguments to use for formatting. It must not be
+     *            {@code null}.
      *
-     * @return the supplier
+     * @return the formatted text
      */
-    default Supplier<String> bind(Object... args) {
-        return () -> apply(args);
-    }
+    String with(Object... args);
 }
