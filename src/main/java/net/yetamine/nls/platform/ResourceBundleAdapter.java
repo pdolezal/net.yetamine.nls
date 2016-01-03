@@ -1,4 +1,4 @@
-package net.yetamine.nls.bridge;
+package net.yetamine.nls.platform;
 
 import java.util.Objects;
 import java.util.ResourceBundle;

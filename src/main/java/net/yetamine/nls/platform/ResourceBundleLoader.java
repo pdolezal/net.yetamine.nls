@@ -1,4 +1,4 @@
-package net.yetamine.nls.bridge;
+package net.yetamine.nls.platform;
 
 import java.util.Locale;
 import java.util.MissingResourceException;

@@ -1,4 +1,4 @@
-package net.yetamine.nls.bridge;
+package net.yetamine.nls.platform;
 
 import java.io.IOException;
 import java.util.List;
