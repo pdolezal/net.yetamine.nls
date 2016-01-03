@@ -53,25 +53,25 @@ public interface ResourcePackage extends ResourceSupplier {
      * Returns an unresolved resource package with the same name, but using the
      * specified locale supplier.
      *
-     * @param locale
+     * @param value
      *            the locale supplier to use. It must not be {@code null} and it
      *            must return a valid locale.
      *
      * @return a resource package for the specified locale
      */
-    ResourcePackage locale(Supplier<Locale> locale);
+    ResourcePackage locale(Supplier<Locale> value);
 
     /**
      * Returns a resource package with the same name for the specified locale;
      * if this instance is resolved and the locale is the same, the result is
      * this instance, otherwise an unresolved instance is returned.
      *
-     * @param locale
+     * @param value
      *            the locale to use. It must not be {@code null}.
      *
      * @return a resource package for the specified locale
      */
-    ResourcePackage locale(Locale locale);
+    ResourcePackage locale(Locale value);
 
     /**
      * Returns the actual locale.

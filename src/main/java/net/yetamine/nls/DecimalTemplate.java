@@ -30,6 +30,20 @@ public interface DecimalTemplate extends DoubleFunction<String> {
         }
 
         /**
+         * Binds this resource to a source.
+         *
+         * @param source
+         *            the source to bind to. It must not be {@code null}.
+         * @param value
+         *            the value to bind
+         *
+         * @return the resource binding
+         */
+        default ResourceBinding bind(ResourcePackage source, double value) {
+            return new ResourceBinding(source, s -> from(s).with(value));
+        }
+
+        /**
          * Creates a new instance with the given name.
          *
          * @param name

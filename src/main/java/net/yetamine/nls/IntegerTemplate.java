@@ -34,6 +34,19 @@ public interface IntegerTemplate extends LongFunction<String> {
         default IntegerTemplate from(ResourceSupplier resources) {
             return resources.integer(name());
         }
+        /**
+         * Binds this resource to a source.
+         *
+         * @param source
+         *            the source to bind to. It must not be {@code null}.
+         * @param value
+         *            the value to bind
+         *
+         * @return the resource binding
+         */
+        default ResourceBinding bind(ResourcePackage source, long value) {
+            return new ResourceBinding(source, s -> from(s).with(value));
+        }
 
         /**
          * Creates a new instance with the given name.

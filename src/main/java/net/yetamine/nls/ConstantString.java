@@ -17,6 +17,18 @@ public interface ConstantString extends ResourceReference<String> {
     }
 
     /**
+     * Binds this resource to a source.
+     *
+     * @param source
+     *            the source to bind to. It must not be {@code null}.
+     *
+     * @return the resource binding
+     */
+    default ResourceBinding bind(ResourcePackage source) {
+        return new ResourceBinding(source, s -> from(s));
+    }
+
+    /**
      * Returns a {@link Supplier} which supplies the result on demand rather
      * than immediate loading of the value.
      *
@@ -25,7 +37,7 @@ public interface ConstantString extends ResourceReference<String> {
      *
      * @return a {@link Supplier} which supplies the result on demand
      */
-    default Supplier<String> bind(ResourceSupplier resources) {
+    default Supplier<String> using(ResourceSupplier resources) {
         Objects.requireNonNull(resources);
         return () -> from(resources);
     }

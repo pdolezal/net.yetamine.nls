@@ -23,6 +23,20 @@ public interface MessageTemplate {
         }
 
         /**
+         * Binds this resource to a source.
+         *
+         * @param source
+         *            the source to bind to. It must not be {@code null}.
+         * @param args
+         *            the arguments to bind. It must not be {@code null}.
+         *
+         * @return the resource binding
+         */
+        default ResourceBinding bind(ResourcePackage source, Object... args) {
+            return new ResourceBinding(source, s -> from(s).with(args));
+        }
+
+        /**
          * Creates a new instance with the given name.
          *
          * @param name
