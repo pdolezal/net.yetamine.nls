@@ -63,7 +63,6 @@ public final class ResourceBundleFallback extends ResourceBundle.Control {
     @Override
     public Locale getFallbackLocale(String baseName, Locale locale) {
         Objects.requireNonNull(baseName);
-        Objects.requireNonNull(locale);
-        return null;
+        return locale.equals(Locale.ROOT) ? null : Locale.ROOT;
     }
 }

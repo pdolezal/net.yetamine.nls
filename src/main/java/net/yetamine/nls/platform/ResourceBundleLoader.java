@@ -1,6 +1,5 @@
 package net.yetamine.nls.platform;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Objects;
@@ -67,27 +66,6 @@ public interface ResourceBundleLoader {
      * @return the new instance
      */
     static ResourceBundleLoader using(ClassLoader loader) {
-        return using(loader, new ResourceBundle.Control() { // TODO: Improve implementation
-
-            /**
-             * @see java.util.ResourceBundle.Control#getFormats(java.lang.String)
-             */
-            @Override
-            public List<String> getFormats(String baseName) {
-                Objects.requireNonNull(baseName);
-                return FORMAT_PROPERTIES;
-            }
-
-            /**
-             * @see java.util.ResourceBundle.Control#getFallbackLocale(java.lang.String,
-             *      java.util.Locale)
-             */
-            @Override
-            public Locale getFallbackLocale(String baseName, Locale locale) {
-                Objects.requireNonNull(baseName);
-                final Locale result = Locale.ROOT;
-                return locale.equals(result) ? null : result;
-            }
-        });
+        return using(loader, ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_PROPERTIES));
     }
 }

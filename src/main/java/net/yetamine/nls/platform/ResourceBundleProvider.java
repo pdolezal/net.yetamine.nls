@@ -1,8 +1,13 @@
 package net.yetamine.nls.platform;
 
+import java.lang.invoke.MethodHandles;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.stream.Stream;
 
+import net.yetamine.nls.ResourceDiscovery;
 import net.yetamine.nls.ResourcePackage;
 import net.yetamine.nls.ResourceSupplier;
 
@@ -76,6 +81,41 @@ public final class ResourceBundleProvider {
      */
     public static ResourcePackage bundle(Class<?> clazz) {
         return factory(clazz.getClassLoader()).bind(clazz.getName());
+    }
+
+    /**
+     * Creates a new instance that searches the specified list of classes, using
+     * the first given class's loader for subsequent loading operations, to find
+     * all resources and make a fallback bundle of them.
+     *
+     * @param lookup
+     *            the lookup object to use for reading the fields with the
+     *            resource definitions. It may be {@code null} if reflective
+     *            access is no problem, otherwise it should be the instance that
+     *            has the access to the fields to be inspected.
+     * @param clazz
+     *            the class whose class loader shall be used and whose name
+     *            should be used for the resource bundle name. It must not be
+     *            {@code null}.
+     * @param classes
+     *            the additional classes to be inspected. It must not be
+     *            {@code null} and may not contain any {@code null} values.
+     *
+     * @return the new instance
+     *
+     * @see ResourceDiscovery
+     */
+    public static ResourcePackage from(MethodHandles.Lookup lookup, Class<?> clazz, Class<?>... classes) {
+        final Map<String, String> map = new HashMap<>(); // The map with the actual resources
+        final ResourceDiscovery discovery = new ResourceDiscovery(map::put).lookup(lookup);
+        if (discovery.test(clazz)) { // The umbrella class may be omitted from inspection
+            discovery.add(clazz);
+        }
+
+        Stream.of(classes).forEach(discovery); // Inspect all other given classes, these must pass the test
+        final ResourceBundle.Control bundleControl = new ResourceBundleFallback(new MapResourceBundle(map));
+        final ResourceBundleLoader loader = ResourceBundleLoader.using(clazz.getClassLoader(), bundleControl);
+        return factory(loader).bind(clazz.getName());
     }
 
     private ResourceBundleProvider() {
