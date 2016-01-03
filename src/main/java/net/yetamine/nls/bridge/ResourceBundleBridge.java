@@ -47,16 +47,15 @@ final class ResourceBundleBridge implements ResourcePackage {
     /**
      * @see net.yetamine.nls.ResourcePackage#locale(java.util.function.Supplier)
      */
-    public ResourcePackage locale(Supplier<Locale> locale) {
-        return new ResourceBundleResolver(loader, name(), locale);
+    public ResourcePackage locale(Supplier<Locale> value) {
+        return new ResourceBundleResolver(loader, name(), value);
     }
 
     /**
      * @see net.yetamine.nls.ResourcePackage#locale(java.util.Locale)
      */
-    public ResourcePackage locale(Locale locale) {
-        final Locale current = locale();
-        return locale.equals(current) ? this : new ResourceBundleResolver(loader, name(), () -> current);
+    public ResourcePackage locale(Locale value) {
+        return value.equals(locale()) ? this : new ResourceBundleResolver(loader, name(), () -> value);
     }
 
     /**

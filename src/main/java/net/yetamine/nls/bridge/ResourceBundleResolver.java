@@ -53,15 +53,15 @@ final class ResourceBundleResolver implements ResourcePackage {
     /**
      * @see net.yetamine.nls.ResourcePackage#locale(java.util.function.Supplier)
      */
-    public ResourcePackage locale(Supplier<Locale> locale) {
-        return new ResourceBundleResolver(loader, name, locale);
+    public ResourcePackage locale(Supplier<Locale> value) {
+        return new ResourceBundleResolver(loader, name, value);
     }
 
     /**
      * @see net.yetamine.nls.ResourcePackage#locale(java.util.Locale)
      */
-    public ResourcePackage locale(Locale locale) {
-        return locale(() -> locale);
+    public ResourcePackage locale(Locale value) {
+        return locale(() -> value);
     }
 
     /**
