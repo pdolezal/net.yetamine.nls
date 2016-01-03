@@ -37,15 +37,15 @@ public interface ResourceReference<T> {
     String name();
 
     /**
-     * Retrieves the resource from the given resouce package.
+     * Retrieves the resource from the given resouce supplier.
      *
      * @param resources
-     *            the resource package to use. It must not be {@code null}.
+     *            the resource supplierto use. It must not be {@code null}.
      *
      * @return the resource
      *
      * @throws MissingResourceException
      *             if the resource could not be retrieved
      */
-    T from(ResourcePackage resources);
+    T from(ResourceSupplier resources);
 }

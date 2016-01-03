@@ -1,7 +1,5 @@
 package net.yetamine.nls;
 
-import java.text.ChoiceFormat;
-import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.function.Supplier;
@@ -17,7 +15,7 @@ import java.util.function.Supplier;
  * very efficient for a sequence of resolutions. This scenario is supported with
  * {@link #resolve()} that returns a fully resolved instance.
  */
-public interface ResourcePackage {
+public interface ResourcePackage extends ResourceSupplier {
 
     /**
      * Returns the name of this resource package.
@@ -86,69 +84,6 @@ public interface ResourcePackage {
      * @return the actual locale
      */
     Locale locale();
-
-    /**
-     * Retrieves a resource of the given name and returns it as a {@link String}
-     * which is usually best for string constants or when the raw string content
-     * of a template is needed.
-     *
-     * @param name
-     *            the name of the resource. It must not be {@code null}.
-     *
-     * @return the string content of the resource
-     */
-    String string(String name);
-
-    /**
-     * Constructs a template from a resource with the given name and returns the
-     * template.
-     *
-     * <p>
-     * The default implementation is based on {@link ChoiceFormat} while using
-     * {@link #string(String)} to load the formatting pattern.
-     *
-     * @param name
-     *            the name of the resource. It must not be {@code null}.
-     *
-     * @return the template
-     */
-    default DecimalTemplate decimal(String name) {
-        return value -> new ChoiceFormat(string(name)).format(value);
-    }
-
-    /**
-     * Constructs a template from a resource with the given name and returns the
-     * template.
-     *
-     * <p>
-     * The default implementation is based on {@link ChoiceFormat} while using
-     * {@link #string(String)} to load the formatting pattern.
-     *
-     * @param name
-     *            the name of the resource. It must not be {@code null}.
-     *
-     * @return the template
-     */
-    default IntegralTemplate integral(String name) {
-        return value -> new ChoiceFormat(string(name)).format(value);
-    }
-
-    /**
-     * Constructs a template from a resource with the given name and returns the
-     * template.
-     *
-     * <p>
-     * The default implementation is based on {@link MessageFormat} while using
-     * {@link #string(String)} to load the formatting pattern.
-     *
-     * @param name
-     *            the name of the resource. It must not be {@code null}.
-     *
-     * @return the template
-     */
-    default MessageTemplate message(String name) {
-        return args -> MessageFormat.format(string(name), args);
-    }
 
     /**
      * A factory interface for {@link ResourcePackage}.

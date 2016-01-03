@@ -10,9 +10,9 @@ import java.util.function.Supplier;
 public interface ConstantString extends ResourceReference<String> {
 
     /**
-     * @see net.yetamine.nls.ResourceReference#from(net.yetamine.nls.ResourcePackage)
+     * @see net.yetamine.nls.ResourceReference#from(net.yetamine.nls.ResourceSupplier)
      */
-    default String from(ResourcePackage resources) {
+    default String from(ResourceSupplier resources) {
         return resources.string(name());
     }
 
@@ -25,7 +25,7 @@ public interface ConstantString extends ResourceReference<String> {
      *
      * @return a {@link Supplier} which supplies the result on demand
      */
-    default Supplier<String> bind(ResourcePackage resources) {
+    default Supplier<String> bind(ResourceSupplier resources) {
         Objects.requireNonNull(resources);
         return () -> from(resources);
     }

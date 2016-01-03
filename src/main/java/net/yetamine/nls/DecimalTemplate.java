@@ -23,9 +23,9 @@ public interface DecimalTemplate extends DoubleFunction<String> {
     interface Reference extends ResourceReference<DecimalTemplate> {
 
         /**
-         * @see net.yetamine.nls.ResourceReference#from(net.yetamine.nls.ResourcePackage)
+         * @see net.yetamine.nls.ResourceReference#from(net.yetamine.nls.ResourceSupplier)
          */
-        default DecimalTemplate from(ResourcePackage resources) {
+        default DecimalTemplate from(ResourceSupplier resources) {
             return resources.decimal(name());
         }
 

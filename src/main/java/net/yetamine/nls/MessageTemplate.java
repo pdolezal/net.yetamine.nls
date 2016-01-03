@@ -16,9 +16,9 @@ public interface MessageTemplate {
     interface Reference extends ResourceReference<MessageTemplate> {
 
         /**
-         * @see net.yetamine.nls.ResourceReference#from(net.yetamine.nls.ResourcePackage)
+         * @see net.yetamine.nls.ResourceReference#from(net.yetamine.nls.ResourceSupplier)
          */
-        default MessageTemplate from(ResourcePackage resources) {
+        default MessageTemplate from(ResourceSupplier resources) {
             return resources.message(name());
         }
 

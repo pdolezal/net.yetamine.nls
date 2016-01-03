@@ -4,10 +4,10 @@ import java.util.Objects;
 import java.util.function.LongFunction;
 
 /**
- * A formatter for numeric quantities of an integral nature.
+ * A formatter for numeric quantities of an integer nature.
  *
  * <p>
- * This formatter is useful for converting an integral number into a string, but
+ * This formatter is useful for converting an integer number into a string, but
  * the result does not have to be the pure string representation of the value:
  * the resulting string can, e.g., contain the unit of the value in the actual
  * locale and with the respect to the actual language. This example shows the
@@ -19,20 +19,20 @@ import java.util.function.LongFunction;
  * </pre>
  */
 @FunctionalInterface
-public interface IntegralTemplate extends LongFunction<String> {
+public interface IntegerTemplate extends LongFunction<String> {
 
     /**
      * Represents a reference to a resource with the given name that shall be
-     * resolved to a {@link IntegralTemplate}.
+     * resolved to a {@link IntegerTemplate}.
      */
     @FunctionalInterface
-    interface Reference extends ResourceReference<IntegralTemplate> {
+    interface Reference extends ResourceReference<IntegerTemplate> {
 
         /**
-         * @see net.yetamine.nls.ResourceReference#from(net.yetamine.nls.ResourcePackage)
+         * @see net.yetamine.nls.ResourceReference#from(net.yetamine.nls.ResourceSupplier)
          */
-        default IntegralTemplate from(ResourcePackage resources) {
-            return resources.integral(name());
+        default IntegerTemplate from(ResourceSupplier resources) {
+            return resources.integer(name());
         }
 
         /**

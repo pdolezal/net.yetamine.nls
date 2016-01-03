@@ -4,11 +4,24 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 import net.yetamine.nls.ResourcePackage;
+import net.yetamine.nls.ResourceSupplier;
 
 /**
  * The provider of the implementation based on {@link ResourceBundle} support.
  */
 public final class ResourceBundleProvider {
+
+    /**
+     * Creates an adapter of a {@link ResourceBundle}.
+     *
+     * @param bundle
+     *            the bundle to adapt. It must not be {@code null}.
+     *
+     * @return the adapter
+     */
+    public static ResourceSupplier adapt(ResourceBundle bundle) {
+        return new ResourceBundleAdapter(bundle);
+    }
 
     /**
      * Creates a factory using the specified {@link ResourceBundleLoader} to
