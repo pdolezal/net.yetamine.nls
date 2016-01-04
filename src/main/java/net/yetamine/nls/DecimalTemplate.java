@@ -23,10 +23,17 @@ public interface DecimalTemplate extends DoubleFunction<String> {
     interface Reference extends ResourceReference<DecimalTemplate> {
 
         /**
-         * @see net.yetamine.nls.ResourceReference#from(net.yetamine.nls.ResourceSupplier)
+         * @see net.yetamine.nls.ResourceReference#use(net.yetamine.nls.ResourceSupplier)
          */
-        default DecimalTemplate from(ResourceSupplier resources) {
+        default DecimalTemplate use(ResourceSupplier resources) {
             return resources.decimal(name());
+        }
+
+        /**
+         * @see net.yetamine.nls.ResourceReference#use()
+         */
+        default DecimalTemplate use() {
+            return use(ResourceContext.require());
         }
 
         /**
@@ -40,7 +47,7 @@ public interface DecimalTemplate extends DoubleFunction<String> {
          * @return the resource binding
          */
         default ResourceBinding bind(ResourcePackage source, double value) {
-            return new ResourceBinding(source, s -> from(s).with(value));
+            return new ResourceBinding(source, s -> use(s).with(value));
         }
 
         /**

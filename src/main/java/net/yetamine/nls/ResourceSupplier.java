@@ -70,4 +70,13 @@ public interface ResourceSupplier {
     default MessageTemplate message(String name) {
         return args -> MessageFormat.format(string(name), args);
     }
+
+    /**
+     * Establishes a local context for this supplier.
+     *
+     * @return the established context
+     */
+    default ResourceContext context() {
+        return ResourceContext.open(this);
+    }
 }

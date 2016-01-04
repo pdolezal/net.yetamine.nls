@@ -16,10 +16,17 @@ public interface MessageTemplate {
     interface Reference extends ResourceReference<MessageTemplate> {
 
         /**
-         * @see net.yetamine.nls.ResourceReference#from(net.yetamine.nls.ResourceSupplier)
+         * @see net.yetamine.nls.ResourceReference#use(net.yetamine.nls.ResourceSupplier)
          */
-        default MessageTemplate from(ResourceSupplier resources) {
+        default MessageTemplate use(ResourceSupplier resources) {
             return resources.message(name());
+        }
+
+        /**
+         * @see net.yetamine.nls.ResourceReference#use()
+         */
+        default MessageTemplate use() {
+            return use(ResourceContext.require());
         }
 
         /**
@@ -33,7 +40,7 @@ public interface MessageTemplate {
          * @return the resource binding
          */
         default ResourceBinding bind(ResourcePackage source, Object... args) {
-            return new ResourceBinding(source, s -> from(s).with(args));
+            return new ResourceBinding(source, s -> use(s).with(args));
         }
 
         /**

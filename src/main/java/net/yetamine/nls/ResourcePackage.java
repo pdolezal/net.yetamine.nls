@@ -149,4 +149,14 @@ public interface ResourcePackage extends ResourceSupplier {
             return bind(name, locale).resolve();
         }
     }
+
+    /**
+     * The default implementation uses a resolved form of this instance to make
+     * the context.
+     *
+     * @see net.yetamine.nls.ResourceSupplier#context()
+     */
+    default ResourceContext context() {
+        return ResourceContext.open(resolve());
+    }
 }

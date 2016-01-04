@@ -29,11 +29,19 @@ public interface IntegerTemplate extends LongFunction<String> {
     interface Reference extends ResourceReference<IntegerTemplate> {
 
         /**
-         * @see net.yetamine.nls.ResourceReference#from(net.yetamine.nls.ResourceSupplier)
+         * @see net.yetamine.nls.ResourceReference#use(net.yetamine.nls.ResourceSupplier)
          */
-        default IntegerTemplate from(ResourceSupplier resources) {
+        default IntegerTemplate use(ResourceSupplier resources) {
             return resources.integer(name());
         }
+
+        /**
+         * @see net.yetamine.nls.ResourceReference#use()
+         */
+        default IntegerTemplate use() {
+            return use(ResourceContext.require());
+        }
+
         /**
          * Binds this resource to a source.
          *
@@ -45,7 +53,7 @@ public interface IntegerTemplate extends LongFunction<String> {
          * @return the resource binding
          */
         default ResourceBinding bind(ResourcePackage source, long value) {
-            return new ResourceBinding(source, s -> from(s).with(value));
+            return new ResourceBinding(source, s -> use(s).with(value));
         }
 
         /**

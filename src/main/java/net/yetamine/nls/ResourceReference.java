@@ -40,12 +40,24 @@ public interface ResourceReference<T> {
      * Retrieves the resource from the given resouce supplier.
      *
      * @param resources
-     *            the resource supplierto use. It must not be {@code null}.
+     *            the resource supplier to use. It must not be {@code null}.
      *
      * @return the resource
      *
      * @throws MissingResourceException
      *             if the resource could not be retrieved
      */
-    T from(ResourceSupplier resources);
+    T use(ResourceSupplier resources);
+
+    /**
+     * Retrieves the resource from the current context supplier.
+     *
+     * @return the resource
+     *
+     * @throws IllegalStateException
+     *             if no context is available at this moment
+     * @throws MissingResourceException
+     *             if the resource could not be retrieved
+     */
+    T use();
 }

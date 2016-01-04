@@ -35,14 +35,14 @@ Assuming that `RESOURCES` contains a reference to `ResourcePackage` and `remaini
 
 ```{java}
 // Produces "1 day" or "2 days" etc.
-final String days = DAYS.from(RESOURCES).with(remaining);
+final String days = DAYS.use(RESOURCES).with(remaining);
 // Produces the whole text, with properly formatted days.
-final String text = TEXT.from(RESOURCES).with("Peter", remaining, days);
+final String text = TEXT.use(RESOURCES).with("Peter", remaining, days);
 
 System.out.println(text); // Print it. Of course, we could stuff that all in one statement.
 ```
 
-Notice the `from`-`with` pattern which allows to fluently specify the source and application of the result.
+Notice the `use`-`with` pattern which allows to fluently specify the source and application of the result.
 
 Well, there is much cooler use, thanks to employing `interface` instead of carving all in `class` types. What about turning an `enum` in a resource stockpile as it is quite usual? Maybe not as usual as this small magic trick:
 
@@ -66,7 +66,7 @@ And you are done. Using the `enum` is natural:
 ```{java}
 // Print all the known titles
 for (Title title : Title.values()) {
-    System.out.println(title.from(RESOURCES));
+    System.out.println(title.use(RESOURCES));
 }
 ```
 
