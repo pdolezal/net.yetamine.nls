@@ -2,6 +2,7 @@ package net.yetamine.nls;
 
 import java.text.ChoiceFormat;
 import java.text.MessageFormat;
+import java.util.function.Supplier;
 
 /**
  * A source of templates and strings.
@@ -78,5 +79,35 @@ public interface ResourceSupplier {
      */
     default ResourceContext context() {
         return ResourceContext.open(this);
+    }
+
+    /**
+     * Returns a result of the specified supplier that may use
+     * {@link #context()} of this instance implicitly.
+     *
+     * @param <T>
+     *            the type of the result
+     * @param s
+     *            the supplier to execute. It must not be {@code null}.
+     *
+     * @return the result of the supplier
+     */
+    default <T> T supply(Supplier<? extends T> s) {
+        try (ResourceContext context = context()) {
+            return s.get();
+        }
+    }
+
+    /**
+     * Executes the given operation may use {@link #context()} of this instance
+     * implicitly.
+     *
+     * @param r
+     *            the operation to execute. It must not be {@code null}.
+     */
+    default void execute(Runnable r) {
+        try (ResourceContext context = context()) {
+            r.run();
+        }
     }
 }
