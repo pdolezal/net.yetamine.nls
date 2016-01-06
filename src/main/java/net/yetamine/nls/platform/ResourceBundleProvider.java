@@ -105,7 +105,7 @@ public final class ResourceBundleProvider {
      *
      * @see ResourceDiscovery
      */
-    public static ResourcePackage from(MethodHandles.Lookup lookup, Class<?> clazz, Class<?>... classes) {
+    public static ResourcePackage discover(MethodHandles.Lookup lookup, Class<?> clazz, Class<?>... classes) {
         final Map<String, String> map = new HashMap<>(); // The map with the actual resources
         final ResourceDiscovery discovery = new ResourceDiscovery(map::put).lookup(lookup);
         if (discovery.test(clazz)) { // The umbrella class may be omitted from inspection

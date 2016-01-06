@@ -3,6 +3,7 @@ package net.yetamine.nls;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.util.Objects;
@@ -116,10 +117,13 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
             throw new IllegalArgumentException(clazz.toString());
         }
 
+        // Cache the access control context for later invocations of adding fields
+        final AccessControlContext acc = (lookup != null) ? AccessController.getContext() : null;
+
         Stream.of(clazz.getFields()).filter(field -> {
             final int modifiers = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
             return (field.getModifiers() & modifiers) == modifiers;
-        }).forEach(this::add);
+        }).forEach(field -> add(field, acc));
 
         return this;
     }
@@ -131,8 +135,12 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
      *            the field to inspect. It must not be {@code null} and it must
      *            be accessible with the current lookup, properly annotated and
      *            formatted.
+     * @param acc
+     *            the {@link AccessControlContext} for adding the field if not
+     *            using the lookup object. It must not be {@code null} if no
+     *            lookup is specified.
      */
-    private void add(Field field) {
+    private void add(Field field, AccessControlContext acc) {
         final ResourceDefinition definition = field.getAnnotation(ResourceDefinition.class);
         if (definition == null) { // Definition missing, not a resource
             return;
@@ -145,7 +153,7 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
         }
 
         try { // Read the name from the field content
-            final Object o = field.isAccessible() ? field.get(null) : readField(field);
+            final Object o = field.isAccessible() ? field.get(null) : readField(field, acc);
 
             if (o instanceof ResourceReference<?>) {
                 result.accept(((ResourceReference<?>) o).name(), definition.value());
@@ -163,20 +171,25 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
      *
      * @param field
      *            the field to read. It must not be {@code null}.
+     * @param acc
+     *            the {@link AccessControlContext} for adding the field if not
+     *            using the lookup object. It must not be {@code null} if no
+     *            lookup is specified.
      *
      * @return the field content
      *
      * @throws IllegalAccessException
-     *             e if the access is disallowed
+     *             if the access is disallowed
      * @throws SecurityException
-     *             e if the access is disallowed
+     *             if the access is disallowed
      */
-    private Object readField(Field field) throws IllegalAccessException {
+    private Object readField(Field field, AccessControlContext acc) throws IllegalAccessException {
         try {
             if (lookup != null) { // Use the lookup object if available
                 return lookup.unreflectGetter(field).invoke();
             }
 
+            assert (acc != null);
             return AccessController.doPrivileged((PrivilegedExceptionAction<?>) () -> {
                 field.setAccessible(true);
                 try {
@@ -184,7 +197,7 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
                 } finally {
                     field.setAccessible(false);
                 }
-            });
+            }, acc);
         } catch (IllegalAccessException | RuntimeException | Error e) {
             throw e; // Let these propagate directly
         } catch (Throwable e) {
