@@ -189,15 +189,17 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
                 return lookup.unreflectGetter(field).invoke();
             }
 
-            assert (acc != null);
-            return AccessController.doPrivileged((PrivilegedExceptionAction<?>) () -> {
+            assert (acc != null); // Warning: using this method is state-dependent
+            final PrivilegedExceptionAction<?> read = () -> {
                 field.setAccessible(true);
                 try {
                     return field.get(null);
                 } finally {
                     field.setAccessible(false);
                 }
-            }, acc);
+            };
+
+            return AccessController.doPrivileged((PrivilegedExceptionAction<?>) read, acc);
         } catch (IllegalAccessException | RuntimeException | Error e) {
             throw e; // Let these propagate directly
         } catch (Throwable e) {

@@ -74,7 +74,7 @@ final class ResourceBundleResolver implements ResourcePackage {
     /**
      * @see net.yetamine.nls.ResourcePackage#string(java.lang.String)
      */
-    public String string(String name) {
-        return loader.load(name(), locale()).getString(name);
+    public String string(String identifier) {
+        return loader.load(name(), locale()).getString(identifier);
     }
 }
