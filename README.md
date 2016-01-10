@@ -9,14 +9,19 @@ Notable fact is that the library uses pure Java and just the runtime libraries, 
 
 A resource bundle analogue is provided as the `ResourcePackage` interface. The interface serves as a factory for the most common resource types: a constant string, a message template and a numeric template. The role of a rich resource identifier in the source have their "reference" counter-parts.
 
-Combined together, the client code uses just a mechanism-agnostic resource references and uses an externally supplied resource packages to resolve the resources. Because the resource package is an interface that does not require much, nor specifies any class loader details, it can hide much more easily alternative means like external resources even without using `ResourceBundle`s if not suitable, or even combining more means together.
+Combined together, the client code uses just a mechanism-agnostic resource references and uses an externally supplied resource packages to resolve the resources. Because the resource package is an interface that does not require much, nor specifies any class loader details, it can hide much more easily alternative means like external resources even without using any `ResourceBundle` if not suitable, or even combining more means together.
 
 For better understanding the implications of the design, see examples below.
 
 
 ## Examples ##
 
-Declaration of resource references (i.e., resource identifiers) in the classical way, the comments shows the content of a classical property file for a `ResourceBundle`:
+The common approach for dealing with resources is to have constants representing resources. Ideally, these constants are *not* just plain names of the resources, but rather proxies or strategies that provide the actual resource on demand. So, it should not be surprising that the constants that we would work with are such smarter objects. However, there are multiple ways of dealing with this starting point – let's see some of them.
+
+
+### Declaring some resource references ###
+
+One of the classical solution is defining the resource-referring constants as usual constants, often in a dedicated class that provide them for a package or otherwise represent a resource bundle. So, let's do it – the following code snippet shows a declaration of such constants, called in this case *resource references*. For illustrative purposes the comments show the possible content of the particular resource (using the pattern syntax for `MessageFormat` and `ChoiceFormat` from standard Java libraries):  
 
 ```{java}
 final class Messages {
@@ -31,20 +36,36 @@ final class Messages {
 }
 ```
 
-Assuming that `RESOURCES` contains a reference to `ResourcePackage` and `remaining` the number of remaining days, following code prints a message like *Hello Peter, your subscription remains valid for 1 day.* or perhaps with a different locale *Halo, Peter, Dein Abonnement läuft in einem Tag ab.*:
+It is a bit richer than a plain string constant with the identifier of a resource, but hopefully not as bad.
+
+
+### Using the resource references ###
+
+When we have some resource references, we would like to use them. Let's assume that `RESOURCES` contains a reference to a `ResourcePackage` instance (how to get it would be covered later) and `remaining` is a numeric variable with the number of remaining days. Then following code snippet a message like *Hello Peter, your subscription remains valid for 1 day.* Or perhaps with a different locale: *Halo, Peter, Dein Abonnement läuft in einem Tag ab.*:
 
 ```{java}
-// Produces "1 day" or "2 days" etc.
+// Produces properly formatted day amount, e.g., "1 day" or "2 days". 
 final String days = DAYS.use(RESOURCES).with(remaining);
 // Produces the whole text, with properly formatted days.
-final String text = TEXT.use(RESOURCES).with("Peter", remaining, days);
+final String text = TEXT.use(RESOURCES).with("Peter", days);
 
-System.out.println(text); // Print it. Of course, we could stuff that all in one statement.
+System.out.println(text); // Print it. Of course, we could stuff that all in one long statement.
 ```
 
-Notice the `use`-`with` pattern which allows to fluently specify the source and application of the result.
+Notice the `use`-`with` pattern which allows to fluently specify the source and application of the result. Although the pattern is quite fluent and not so verbose, the code still refers to `RESOURCES` repeatedly, which might become annoying when composing some output from many resources. To mitigate this repetition, it is possible to specify a local implicit resource source. The idea of a local implicit resource source is naturally combined with try-with-resources:
 
-Well, there is much cooler use, thanks to employing `interface` instead of carving all in `class` types. What about turning an `enum` in a resource stockpile as it is quite usual? Maybe not as usual as this small magic trick:
+```{java}
+try (ResourceContext rc = RESOURCES.context()) {
+    System.out.println(TEXT.use().with("Peter", DAYS.use().with(remaining));
+}
+```
+
+Leaving out the repeated references to `RESOURCES` leads to more compact code. The `use`-`with` pattern is preserved, just `use` now specifies no arguments, relying on the presence of the implicit resource source. Btw. it could be possible to get rid of the `use` invocations completely, but we decided not to do so in order to prevent some confusion and the risk of more likely wrong uses of the construct.
+
+
+### Declaring resource references revisited ###
+
+Declaring the resource references in the original way works, but still is not very appealing. There are several other ways how to improve it; using an `enum` is quite usual, but maybe not in this way: 
 
 ```{java}
 enum Title implements ConstantString {
@@ -52,7 +73,7 @@ enum Title implements ConstantString {
 }
 ```
 
-That's it. When using common `ResourceBundle` implementation, define your resources like:
+That's it all in the source code. When using properties for the resource, the properties could contain following:
 
 ```{properties}
 MR   = Mr.
@@ -61,7 +82,7 @@ MRS  = Mrs.
 MISS = Miss
 ```
 
-And you are done. Using the `enum` is natural:
+And you are done. Using such an `enum` is natural:
 
 ```{java}
 // Print all the known titles
@@ -69,6 +90,55 @@ for (Title title : Title.values()) {
     System.out.println(title.use(RESOURCES));
 }
 ```
+
+
+### Working with a `ResourcePackage` ###
+
+A `ResourcePackage` instance may be constructed to use a `Supplier` to decide the locale automatically, hence `Locale::getDefault` is the natural choice which works well. But it is possible always to ask for a specific `Locale` instead. Putting the pieces together, a language selection menu could be rendered with similar code:
+
+```{java}
+supportedLocales().forEach(locale -> {
+    displayLocaleOption(locale, MESSAGE.use(RESOURCES.locale(locale)))
+});
+```
+
+
+### Getting a `ResourcePackage` instance ###
+
+Last, but not least: how to get some resource package to work with? Well, this depends on your own decision and on what you want to use as the underlying source of the actual resources. Perhaps you can let your favourite framework inject some into your classes. Or if you are satisfied with usual properties resources, you can use our `ResourceBundleProvider` based on the standard `ResourceBundle` facility. Or you can implement your own solution that fits your needs better. Here we mention briefly our `ResourceBundleProvider`.
+
+As the simplest case, let's use the `Title` type listed above. If we take it as the name of the resource package and let the resources for the package load by the class's `ClassLoader`, then we simply add resources `Title.properties` and possibly localized variants like `Title_de.properties` and load the resource package:
+
+```{java}
+// In some class, perhaps in Title itself:
+static final ResourcePackage RESOURCES = ResourceBundleProvider.bundle(Title.class);
+```
+
+That's it. Otherwise `ResourceBundleProvider` offers several other methods to deal with more complex cases, including possible customization of the loading process, so that it should be possible to hook it into any framework or environment where `ResourceBundle` has at least remote chance to work.
+
+
+### Cream on the top: resource discovery ###
+
+Resource references have one drawback: they just name the resources that they refer to, while their usage relies on the correctness of the actual resource (e.g., that it does not provide wrong placeholders). Because even the default resources are decoupled from the source, it is quite easy to make a mistake, or perhaps a resource might not be updated according to a change in the source code. The decoupling of the default resources increases the probability that they would be missing as well.
+
+To mitigate these dangers, we provide resource discovery. The idea is that the source code annotates the resource references appopriately with the default values, so that the developer can maintain both the code and the values, and lets a resource package loader construct the default resource package from the annotations:
+
+```{java}
+@ResourceStockpile
+enum Titles implements ConstantString {
+    @ResourceDefinition("Mr.") MR,
+    @ResourceDefinition("Ms.") MS,
+    @ResourceDefinition("Mrs.") MRS,
+    @ResourceDefinition("Miss") MISS;    
+}
+
+// The loading the resource package
+static final ResourcePackage RESOURCES = ResourceBundleProvider.discover(MethodHandles.lookup(), Title.class);
+``` 
+
+The discovery can even aggregate resources from multiple classes into a single resource package, so that it is possible to have multiple `enum`s for different purposes and "implementing" different resource types, while the clients use a single common resource package without being aware of such split. The approach works for usual constant as well (i.e., there is absolutely no requirement to use `enum`s only). 
+
+The discovery enables yet another interesting possibility: the template for translating the resources to other languages can be generated from the sources (well, the tool might be some next project), which we consider to be a better solution than occasional reverse approach when the source code with the resource references is generated from a resource.
 
 
 ## Prerequisites ##
