@@ -31,8 +31,8 @@ public interface ConstantString extends ResourceReference<String> {
      *
      * @return the resource binding
      */
-    default ResourceBinding bind(ResourcePackage source) {
-        return new ResourceBinding(source, s -> use(s));
+    default ResourceBinding<String> bind(ResourcePackage source) {
+        return new ResourceBinding<>(source, s -> use(s));
     }
 
     /**

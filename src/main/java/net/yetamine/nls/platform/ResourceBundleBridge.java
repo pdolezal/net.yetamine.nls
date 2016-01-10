@@ -1,6 +1,7 @@
 package net.yetamine.nls.platform;
 
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
@@ -63,6 +64,18 @@ final class ResourceBundleBridge implements ResourcePackage {
      */
     public Locale locale() {
         return bundle.getLocale();
+    }
+
+    /**
+     * @see net.yetamine.nls.ResourceSupplier#object(java.lang.String)
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T object(String name) {
+        try {
+            return (T) bundle.getObject(name);
+        } catch (MissingResourceException e) {
+            return null;
+        }
     }
 
     /**

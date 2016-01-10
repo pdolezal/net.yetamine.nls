@@ -19,13 +19,6 @@ import java.util.function.Supplier;
 public interface ResourcePackage extends ResourceSupplier {
 
     /**
-     * Returns the name of this resource package.
-     *
-     * @return the name of this resource package
-     */
-    String name();
-
-    /**
      * Returns a fully resolved resource package.
      *
      * <p>

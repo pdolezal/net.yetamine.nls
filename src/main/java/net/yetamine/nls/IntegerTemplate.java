@@ -52,8 +52,8 @@ public interface IntegerTemplate extends LongFunction<String> {
          *
          * @return the resource binding
          */
-        default ResourceBinding bind(ResourcePackage source, long value) {
-            return new ResourceBinding(source, s -> use(s).with(value));
+        default ResourceBinding<String> bind(ResourcePackage source, long value) {
+            return new ResourceBinding<>(source, s -> use(s).with(value));
         }
 
         /**

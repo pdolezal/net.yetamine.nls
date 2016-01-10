@@ -8,11 +8,14 @@ import java.util.function.Function;
 /**
  * A resource with bound operands, so that it is ready for rendering, although
  * retaining the possibility to switch the resource supplier before doing so.
+ *
+ * @param <T>
+ *            the type of the result
  */
-public final class ResourceBinding implements Function<Locale, String> {
+public final class ResourceBinding<T> implements Function<Locale, T> {
 
     /** Resource resolving function. */
-    private final Function<ResourceSupplier, String> resolver;
+    private final Function<ResourceSupplier, T> resolver;
     /** Source of the resource to be applied. */
     private final ResourcePackage source;
 
@@ -25,9 +28,9 @@ public final class ResourceBinding implements Function<Locale, String> {
      *            the resolver of the resource with the respect to the source.
      *            It must not be {@code null}.
      */
-    public ResourceBinding(ResourcePackage resourceSource, Function<ResourceSupplier, String> resourceResolver) {
-        source = Objects.requireNonNull(resourceSource);
+    public ResourceBinding(ResourcePackage resourceSource, Function<ResourceSupplier, T> resourceResolver) {
         resolver = Objects.requireNonNull(resourceResolver);
+        source = Objects.requireNonNull(resourceSource);
     }
 
     /**
@@ -39,7 +42,7 @@ public final class ResourceBinding implements Function<Locale, String> {
     @Override
     public String toString() {
         try {
-            return apply();
+            return Objects.toString(apply());
         } catch (MissingResourceException e) {
             return null;
         }
@@ -50,7 +53,7 @@ public final class ResourceBinding implements Function<Locale, String> {
      *
      * @see java.util.function.Function#apply(java.lang.Object)
      */
-    public String apply(Locale locale) {
+    public T apply(Locale locale) {
         return resolver.apply(source.locale(locale));
     }
 
@@ -59,7 +62,7 @@ public final class ResourceBinding implements Function<Locale, String> {
      *
      * @return the resource value
      */
-    public String apply() {
+    public T apply() {
         return resolver.apply(source());
     }
 
@@ -80,7 +83,7 @@ public final class ResourceBinding implements Function<Locale, String> {
      *
      * @return a new instance using a different locale.
      */
-    public ResourceBinding locale(Locale locale) {
-        return new ResourceBinding(source.locale(locale), resolver);
+    public ResourceBinding<T> locale(Locale locale) {
+        return new ResourceBinding<>(source.locale(locale), resolver);
     }
 }

@@ -15,8 +15,8 @@ import java.util.function.Supplier;
  * The design of this interface assumes that all resources are representable as
  * strings and all related resources are parsed from the strings. Because of
  * that, {@link #string(String)} is supposed to be the common denominator of
- * other methods, providing the string data for creating resources of other
- * types.
+ * other resource-supplying methods, except for {@link #object(String)} that
+ * supports in a way object resources as well.
  *
  * <p>
  * However, this assumption does not prevent an implementation from parsing the
@@ -25,6 +25,37 @@ import java.util.function.Supplier;
  * reflected when using the resource discovery feature.
  */
 public interface ResourceSupplier {
+
+    /**
+     * Returns the name of this resource source.
+     *
+     * @return the name of this resource source, or {@code null} if unknown
+     */
+    String name();
+
+    /**
+     * Retrieves a resource object of the given type.
+     *
+     * <p>
+     * This method, unlike other resource-supplying methods, does not throw an
+     * exception if the object is missing, but rather returns {@code null}. It
+     * is not mentioned for direct use, but it provides rather a base for safe
+     * access methods like {@link ResourceObject}.
+     *
+     * <p>
+     * Note that the method or underlying implementation may not be able to
+     * avoid unchecked casts or other type verifications, hence it is not a
+     * completely type-safe option. Therefore {@link ClassCastException} may
+     * occur as the result of a type check failure at a later point.
+     *
+     * @param <T>
+     *            the type of the resource object
+     * @param name
+     *            the name of the resource. It must not be {@code null}.
+     *
+     * @return the resource object, or {@code null} if missing
+     */
+    <T> T object(String name);
 
     /**
      * Retrieves a resource of the given name and returns it as a {@link String}
@@ -37,7 +68,7 @@ public interface ResourceSupplier {
      * @return the string content of the resource
      *
      * @throws MissingResourceException
-     *             if the resource could not be retrieved
+     *             if the resource could not be found
      */
     String string(String name);
 
@@ -85,7 +116,7 @@ public interface ResourceSupplier {
      * @return the template
      *
      * @throws MissingResourceException
-     *             if the resource could not be retrieved
+     *             if the resource could not be found
      */
     default DecimalTemplate decimal(String name) {
         return value -> new ChoiceFormat(string(name)).format(value);
@@ -104,6 +135,9 @@ public interface ResourceSupplier {
      *            the name of the resource. It must not be {@code null}.
      *
      * @return the template
+     *
+     * @throws MissingResourceException
+     *             if the resource could not be found
      */
     default IntegerTemplate integer(String name) {
         return value -> new ChoiceFormat(string(name)).format(value);
@@ -122,6 +156,9 @@ public interface ResourceSupplier {
      *            the name of the resource. It must not be {@code null}.
      *
      * @return the template
+     *
+     * @throws MissingResourceException
+     *             if the resource could not be found
      */
     default MessageTemplate message(String name) {
         return args -> MessageFormat.format(string(name), args);

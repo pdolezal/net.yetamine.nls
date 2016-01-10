@@ -46,8 +46,8 @@ public interface DecimalTemplate extends DoubleFunction<String> {
          *
          * @return the resource binding
          */
-        default ResourceBinding bind(ResourcePackage source, double value) {
-            return new ResourceBinding(source, s -> use(s).with(value));
+        default ResourceBinding<String> bind(ResourcePackage source, double value) {
+            return new ResourceBinding<>(source, s -> use(s).with(value));
         }
 
         /**

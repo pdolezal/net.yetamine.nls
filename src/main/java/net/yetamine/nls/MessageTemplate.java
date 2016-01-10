@@ -39,8 +39,8 @@ public interface MessageTemplate {
          *
          * @return the resource binding
          */
-        default ResourceBinding bind(ResourcePackage source, Object... args) {
-            return new ResourceBinding(source, s -> use(s).with(args));
+        default ResourceBinding<String> bind(ResourcePackage source, Object... args) {
+            return new ResourceBinding<>(source, s -> use(s).with(args));
         }
 
         /**
