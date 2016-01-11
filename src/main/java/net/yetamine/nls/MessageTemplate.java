@@ -13,20 +13,13 @@ public interface MessageTemplate {
      * resolved to a {@link MessageTemplate}.
      */
     @FunctionalInterface
-    interface Reference extends ResourceReference<MessageTemplate> {
+    interface Reference extends ResourceObject<MessageTemplate> {
 
         /**
-         * @see net.yetamine.nls.ResourceReference#use(net.yetamine.nls.ResourceSupplier)
+         * @see net.yetamine.nls.ResourceReference#use(net.yetamine.nls.ResourceProvider)
          */
-        default MessageTemplate use(ResourceSupplier resources) {
+        default MessageTemplate use(ResourceProvider resources) {
             return resources.message(name());
-        }
-
-        /**
-         * @see net.yetamine.nls.ResourceReference#use()
-         */
-        default MessageTemplate use() {
-            return use(ResourceContext.require());
         }
 
         /**

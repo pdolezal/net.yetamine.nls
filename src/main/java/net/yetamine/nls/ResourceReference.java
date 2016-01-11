@@ -37,29 +37,29 @@ public interface ResourceReference<T> {
     String name();
 
     /**
-     * Retrieves the resource from the given resouce supplier.
+     * Retrieves the resource from the given resouce provider.
      *
      * @param resources
-     *            the resource supplier to use. It must not be {@code null}.
+     *            the resource provider use. It must not be {@code null}.
      *
      * @return the resource
      *
      * @throws MissingResourceException
      *             if the resource could not be retrieved
      */
-    T use(ResourceSupplier resources);
+    T use(ResourceProvider resources);
 
     /**
-     * Retrieves the resource from the current implicit supplier.
+     * Retrieves the resource from the current implicit provider.
      *
      * @return the resource
      *
      * @throws IllegalStateException
-     *             if no implicit supplier is available at this moment
+     *             if no implicit provider is available at this moment
      * @throws MissingResourceException
      *             if the resource could not be retrieved
      *
-     * @see ResourceSupplier#context()
+     * @see ResourceProvider#context()
      */
     T use();
 }

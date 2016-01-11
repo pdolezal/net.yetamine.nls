@@ -26,20 +26,13 @@ public interface IntegerTemplate extends LongFunction<String> {
      * resolved to a {@link IntegerTemplate}.
      */
     @FunctionalInterface
-    interface Reference extends ResourceReference<IntegerTemplate> {
+    interface Reference extends ResourceObject<IntegerTemplate> {
 
         /**
-         * @see net.yetamine.nls.ResourceReference#use(net.yetamine.nls.ResourceSupplier)
+         * @see net.yetamine.nls.ResourceReference#use(net.yetamine.nls.ResourceProvider)
          */
-        default IntegerTemplate use(ResourceSupplier resources) {
+        default IntegerTemplate use(ResourceProvider resources) {
             return resources.integer(name());
-        }
-
-        /**
-         * @see net.yetamine.nls.ResourceReference#use()
-         */
-        default IntegerTemplate use() {
-            return use(ResourceContext.require());
         }
 
         /**

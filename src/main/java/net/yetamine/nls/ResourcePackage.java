@@ -16,7 +16,7 @@ import java.util.function.Supplier;
  * the {@link #resolve()} method, which returns a fully resolved instance, can
  * be used to get a fully resolved instance.
  */
-public interface ResourcePackage extends ResourceSupplier {
+public interface ResourcePackage extends ResourceProvider {
 
     /**
      * Returns a fully resolved resource package.
@@ -83,7 +83,7 @@ public interface ResourcePackage extends ResourceSupplier {
      * The default implementation uses a resolved form of this instance to make
      * the context.
      *
-     * @see net.yetamine.nls.ResourceSupplier#context()
+     * @see net.yetamine.nls.ResourceProvider#context()
      */
     default ResourceContext context() {
         return ResourceContext.open(resolve());

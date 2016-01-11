@@ -67,7 +67,7 @@ final class ResourceBundleBridge implements ResourcePackage {
     }
 
     /**
-     * @see net.yetamine.nls.ResourceSupplier#object(java.lang.String)
+     * @see net.yetamine.nls.ResourceProvider#object(java.lang.String)
      */
     @SuppressWarnings("unchecked")
     public <T> T object(String name) {

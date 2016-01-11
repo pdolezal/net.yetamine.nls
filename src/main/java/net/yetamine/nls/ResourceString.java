@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ResourceDefinition {
+public @interface ResourceString {
 
     /**
      * Returns the default content of the resource.

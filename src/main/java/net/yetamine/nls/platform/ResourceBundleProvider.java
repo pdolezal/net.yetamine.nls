@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 import net.yetamine.nls.ResourceDiscovery;
 import net.yetamine.nls.ResourcePackage;
-import net.yetamine.nls.ResourceSupplier;
+import net.yetamine.nls.ResourceProvider;
 
 /**
  * The provider of the implementation based on {@link ResourceBundle} support.
@@ -24,7 +24,7 @@ public final class ResourceBundleProvider {
      *
      * @return the adapter
      */
-    public static ResourceSupplier adapt(ResourceBundle bundle) {
+    public static ResourceProvider adapt(ResourceBundle bundle) {
         return new ResourceBundleAdapter(bundle);
     }
 

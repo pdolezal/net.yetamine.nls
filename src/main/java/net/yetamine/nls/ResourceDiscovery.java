@@ -152,7 +152,7 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
      *            lookup is specified.
      */
     private void add(Field field, AccessControlContext acc) {
-        final ResourceDefinition definition = field.getAnnotation(ResourceDefinition.class);
+        final ResourceString definition = field.getAnnotation(ResourceString.class);
         if (definition == null) { // Definition missing, not a resource
             return;
         }

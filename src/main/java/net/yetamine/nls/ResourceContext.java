@@ -5,12 +5,12 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * A local resource context which is bound to an implicit resource supplier.
+ * A local resource context which is bound to an implicit resource provider.
  *
  * <p>
- * This class is designed for easier reusing the same supplier in a local code
- * scope, so that it is not necessary to specify the resource supplier for all
- * {@link ResourceReference#use(ResourceSupplier)} method invocations and the
+ * This class is designed for easier reusing the same provider in a local code
+ * scope, so that it is not necessary to specify the resource provider for all
+ * {@link ResourceReference#use(ResourceProvider)} method invocations and the
  * {@link ResourceReference#use()} method may be used instead.
  *
  * <p>
@@ -31,7 +31,7 @@ import java.util.function.Supplier;
  * <p>
  * Another pattern, probably even better in most situation, although not always
  * as flexible when multiple contexts might be useful in parallel, is using the
- * support provided by {@link ResourceSupplier} directly:
+ * support provided by {@link ResourceProvider} directly:
  *
  * <pre>
  * RESOURCES.execute(() -&gt; {
@@ -39,13 +39,13 @@ import java.util.function.Supplier;
  * });
  * </pre>
  */
-public final class ResourceContext implements AutoCloseable, Supplier<ResourceSupplier> {
+public final class ResourceContext implements AutoCloseable, Supplier<ResourceProvider> {
 
     /** Head of the resource context chain, the current context actually. */
     private static final ThreadLocal<ResourceContext> CURRENT = new ThreadLocal<>();
 
-    /** Adapted supplier. */
-    private final ResourceSupplier supplier;
+    /** Adapted resource provider. */
+    private final ResourceProvider provider;
     /** Previous context in the chain. */
     private ResourceContext prev;
     /** Next context in the chain. */
@@ -54,23 +54,23 @@ public final class ResourceContext implements AutoCloseable, Supplier<ResourceSu
     /**
      * Creates a new instance.
      *
-     * @param resourceSupplier
-     *            the supplier to adapt. It must not be {@code null}.
+     * @param resourceProvider
+     *            the provider to adapt. It must not be {@code null}.
      */
-    private ResourceContext(ResourceSupplier resourceSupplier) {
-        supplier = Objects.requireNonNull(resourceSupplier);
+    private ResourceContext(ResourceProvider resourceProvider) {
+        provider = Objects.requireNonNull(resourceProvider);
     }
 
     /**
      * Opens a new context and makes it the current one.
      *
-     * @param supplier
-     *            the supplier to adapt. It must not be {@code null}.
+     * @param provider
+     *            the provider to adapt. It must not be {@code null}.
      *
      * @return the new context
      */
-    public static ResourceContext open(ResourceSupplier supplier) {
-        final ResourceContext result = new ResourceContext(supplier);
+    public static ResourceContext open(ResourceProvider provider) {
+        final ResourceContext result = new ResourceContext(provider);
 
         final ResourceContext current = CURRENT.get();
         if (current != null) { // Hook it into the chain
@@ -83,35 +83,35 @@ public final class ResourceContext implements AutoCloseable, Supplier<ResourceSu
     }
 
     /**
-     * Returns the supplier from the current context.
+     * Returns the provider from the current context.
      *
-     * @return the supplier from the current context, or an empty container if
+     * @return the provider from the current context, or an empty container if
      *         no context is available
      */
-    public static Optional<ResourceSupplier> acquire() {
+    public static Optional<ResourceProvider> acquire() {
         final ResourceContext result = CURRENT.get();
         return (result != null) ? Optional.of(result.get()) : Optional.empty();
     }
 
     /**
-     * Returns the supplier from the current context.
+     * Returns the provider from the current context.
      *
-     * @return the supplier from the current context
+     * @return the provider from the current context
      *
      * @throws IllegalStateException
      *             if no context is available
      */
-    public static ResourceSupplier require() {
+    public static ResourceProvider require() {
         return acquire().orElseThrow(IllegalStateException::new);
     }
 
     /**
-     * Returns the supplier bound to this context.
+     * Returns the provider bound to this context.
      *
      * @see java.util.function.Supplier#get()
      */
-    public ResourceSupplier get() {
-        return supplier;
+    public ResourceProvider get() {
+        return provider;
     }
 
     /**

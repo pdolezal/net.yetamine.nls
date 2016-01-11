@@ -7,7 +7,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * A resource supplier interface.
+ * A resource providing interface.
  *
  * <p>
  * This interface is the core interface of the whole library as it encapsulates
@@ -15,7 +15,7 @@ import java.util.function.Supplier;
  * The design of this interface assumes that all resources are representable as
  * strings and all related resources are parsed from the strings. Because of
  * that, {@link #string(String)} is supposed to be the common denominator of
- * other resource-supplying methods, except for {@link #object(String)} that
+ * other resource-providing methods, except for {@link #object(String)} that
  * supports in a way object resources as well.
  *
  * <p>
@@ -24,7 +24,7 @@ import java.util.function.Supplier;
  * like separated resource types, are possible as well, but those must be then
  * reflected when using the resource discovery feature.
  */
-public interface ResourceSupplier {
+public interface ResourceProvider {
 
     /**
      * Returns the name of this resource source.
@@ -37,7 +37,7 @@ public interface ResourceSupplier {
      * Retrieves a resource object of the given type.
      *
      * <p>
-     * This method, unlike other resource-supplying methods, does not throw an
+     * This method, unlike other resource-providing methods, does not throw an
      * exception if the object is missing, but rather returns {@code null}. It
      * is not mentioned for direct use, but it provides rather a base for safe
      * access methods like {@link ResourceObject}.
@@ -167,19 +167,19 @@ public interface ResourceSupplier {
     // Resource context support
 
     /**
-     * Opens a resource context for this supplier, making it the current
-     * implicit supplier.
+     * Opens a resource context for this provider, making it the current
+     * implicit provider.
      *
      * <p>
      * This method should be used in the following way:
      *
      * <pre>
-     * try (ResourceContext rc = resourceSupplier.context()) {
-     *     // Here 'resourceSupplier' is the implicit resource supplier
+     * try (ResourceContext rc = resourceProvider.context()) {
+     *     // Here 'resourceProvider' is the implicit resource provider
      * }
      * </pre>
      *
-     * @return the context for this supplier
+     * @return the context for this provider
      */
     default ResourceContext context() {
         return ResourceContext.open(this);

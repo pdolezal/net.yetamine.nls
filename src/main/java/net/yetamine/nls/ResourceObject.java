@@ -14,9 +14,9 @@ import java.util.function.Supplier;
 public interface ResourceObject<T> extends ResourceReference<T> {
 
     /**
-     * @see net.yetamine.nls.ResourceReference#use(net.yetamine.nls.ResourceSupplier)
+     * @see net.yetamine.nls.ResourceReference#use(net.yetamine.nls.ResourceProvider)
      */
-    T use(ResourceSupplier resources);
+    T use(ResourceProvider resources);
 
     /**
      * @see net.yetamine.nls.ResourceReference#use()
@@ -46,7 +46,7 @@ public interface ResourceObject<T> extends ResourceReference<T> {
      *
      * @return a {@link Supplier} which supplies the result on demand
      */
-    default Supplier<T> using(ResourceSupplier resources) {
+    default Supplier<T> using(ResourceProvider resources) {
         Objects.requireNonNull(resources);
         return () -> use(resources);
     }
@@ -104,13 +104,13 @@ public interface ResourceObject<T> extends ResourceReference<T> {
      * @param name
      *            the name of the resource. It must not be {@code null}.
      * @param supplier
-     *            the fallback supplier, which gets the {@link ResourceSupplier}
+     *            the fallback supplier, which gets the {@link ResourceProvider}
      *            as the argument, so that it knows the actual failing source.
      *            It must not be {@code null}.
      *
      * @return a resource object
      */
-    static <T> ResourceObject<T> supplier(String name, Function<? super ResourceSupplier, ? extends T> supplier) {
+    static <T> ResourceObject<T> supplier(String name, Function<? super ResourceProvider, ? extends T> supplier) {
         return new DefaultResourceObject<>(name, supplier);
     }
 }
@@ -126,7 +126,7 @@ final class DefaultResourceObject<T> implements ResourceObject<T> {
     /** Name of the resource. */
     private final String name;
     /** Type of the resource. */
-    private final Function<? super ResourceSupplier, ? extends T> fallback;
+    private final Function<? super ResourceProvider, ? extends T> fallback;
 
     /**
      * Creates a new instance.
@@ -136,7 +136,7 @@ final class DefaultResourceObject<T> implements ResourceObject<T> {
      * @param fallbackSupplier
      *            the fallback supplier. It must not be {@code null}.
      */
-    public DefaultResourceObject(String resourceName, Function<? super ResourceSupplier, ? extends T> fallbackSupplier) {
+    public DefaultResourceObject(String resourceName, Function<? super ResourceProvider, ? extends T> fallbackSupplier) {
         name = Objects.requireNonNull(resourceName);
         fallback = Objects.requireNonNull(fallbackSupplier);
     }
@@ -149,9 +149,9 @@ final class DefaultResourceObject<T> implements ResourceObject<T> {
     }
 
     /**
-     * @see net.yetamine.nls.ResourceObject#use(net.yetamine.nls.ResourceSupplier)
+     * @see net.yetamine.nls.ResourceObject#use(net.yetamine.nls.ResourceProvider)
      */
-    public T use(ResourceSupplier resources) {
+    public T use(ResourceProvider resources) {
         final T result = resources.object(name());
         return (result != null) ? result : fallback.apply(resources);
     }

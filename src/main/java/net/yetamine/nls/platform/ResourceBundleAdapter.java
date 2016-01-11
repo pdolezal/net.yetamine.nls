@@ -4,12 +4,12 @@ import java.util.MissingResourceException;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-import net.yetamine.nls.ResourceSupplier;
+import net.yetamine.nls.ResourceProvider;
 
 /**
  * An adapter of a {@link ResourceBundle} instance.
  */
-final class ResourceBundleAdapter implements ResourceSupplier {
+final class ResourceBundleAdapter implements ResourceProvider {
 
     /** Adapted resource bundle. */
     private final ResourceBundle bundle;
@@ -25,14 +25,14 @@ final class ResourceBundleAdapter implements ResourceSupplier {
     }
 
     /**
-     * @see net.yetamine.nls.ResourceSupplier#name()
+     * @see net.yetamine.nls.ResourceProvider#name()
      */
     public String name() {
         return bundle.getBaseBundleName();
     }
 
     /**
-     * @see net.yetamine.nls.ResourceSupplier#object(java.lang.String)
+     * @see net.yetamine.nls.ResourceProvider#object(java.lang.String)
      */
     @SuppressWarnings("unchecked")
     public <T> T object(String name) {

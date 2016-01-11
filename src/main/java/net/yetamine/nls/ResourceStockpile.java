@@ -7,14 +7,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a type providing resource references using {@link ResourceDefinition}.
+ * Marks a type providing resource references using {@link ResourceString}.
  *
  * <p>
  * The annotated type should have no static initialization blocks with
  * side-effects or external dependencies that might provide loading its class in
  * isolation. The type should declare inidividual resources as constants (i.e.,
  * {@code public static final} fields) of {@link ResourceReference} type, being
- * annotated with {@link ResourceDefinition}.
+ * annotated with {@link ResourceString}.
  *
  * <p>
  * The described arrangement allows automated construction of the default

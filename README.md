@@ -7,11 +7,9 @@ Notable fact is that the library uses pure Java and just the runtime libraries, 
 
 ## Library design ##
 
-A resource bundle analogue is provided as the `ResourcePackage` interface (or in most cases using its more limited parent, `ResourceSupplier`, is sufficient). This interface serves as a factory for all supported resource types: a constant string, a message template and a numeric template. Resource reference exist as companions of the resource types in order to enable comfortable access to the resources.
+A resource bundle analogue is provided as the `ResourcePackage` interface (or in most cases using its more limited parent, `ResourceProvider`, is sufficient). This interface serves as a factory for various resource types. Resource reference exist as companions of outstanding resource types in order to enable comfortable access to the resources.
 
-The client code uses just a mechanism-agnostic resource references and uses an externally supplied resource packages to resolve the resources. Because the resource package is an interface that does not require much, nor specifies any class loader details, it can hide much more easily alternative means like external resources even without using any `ResourceBundle` if not suitable, or even combining more means together.
-
-As you can see, object resources are not supported. Object resources seem to be used too rarely to really bother with them, so omitting their support is a deliberate design decision made in order to balance the requirements, complexity and the amount of commonly used functionality.
+The client code uses just a mechanism-agnostic resource references and uses an externally provided resource packages to resolve the resources. Because the resource package is an interface that does not require much, nor specifies any class loader details, it can hide much more easily alternative means like external resources even without using any `ResourceBundle` if not suitable, or even combining more means together.
 
 For better understanding the implications of the design, see examples below.
 
@@ -43,7 +41,7 @@ It is a bit more verbose than a plain string constant with the identifier of a r
 
 ### Using the resource references ###
 
-When we have some resource references, we would like to use them. Let's assume that `RESOURCES` contains a reference to a `ResourceSupplier` instance (how to get it would be covered later) and `remaining` is an acceptable numeric variable with the number of remaining days. Then following code snippet a message like *Hello Peter, your subscription remains valid for 1 day.* Or perhaps with a different locale: *Halo, Peter, Dein Abonnement läuft in einem Tag ab.*:
+When we have some resource references, we would like to use them. Let's assume that `RESOURCES` contains a reference to a `ResourceProvider` instance (how to get it would be covered later) and `remaining` is an acceptable numeric variable with the number of remaining days. Then following code snippet a message like *Hello Peter, your subscription remains valid for 1 day.* Or perhaps with a different locale: *Halo, Peter, Dein Abonnement läuft in einem Tag ab.*:
 
 ```{java}
 // Produces properly formatted day amount, e.g., "1 day" or "2 days". 
@@ -94,6 +92,28 @@ for (Title title : Title.values()) {
 ```
 
 
+### Object resources ###
+
+String-based resources are the most common case of resources that therefore they have special support for easier use. Besides that, they are special because they are often stored in text files like Java properties or XML documents and they can be often dealt with by non-developers as well. Object resources differ: they can't be stored in such a natural way, they need more programmatic support (and therefore developers to mantain them) etc. Fortunately, they are so rare.
+
+However, even for rare cases it is quite good to have at least some support for them. Actually, all string-based resources described above have a relationship to object resources, employing the `ResourceObject` interface. For other resource than these standard string-based resources, arbitrary instances of the `ResourceObject` instances can be created. Object resources have one outstanding specific: their definitions may employ a fallback that is hardwired in the code, therefore the code can be runnable even when no resources are available. This may be often desired with the respect to the nature of object resources.
+
+One outstanding case of real use of an object resource in JDK is related to `java.awt.ComponentOrientation`. Here is an example of dealing with such a resource using our object resources:
+
+```{java}
+// Resource constant definition using a fallback value when no resource provider provides the resource
+static final ResourceObject<ComponentOrientation> ORIENTATION 
+= ResourceObject.constant("orientation", ComponentOrientation.LEFT_TO_RIGHT);
+
+// Using it then is as common as for other resources
+if (ORIENTATION.use(RESOURCES).isLeftToRight()) {
+    // Draw from left to right
+} else {
+    // Flip text direction
+}
+```
+
+
 ### Working with a `ResourcePackage` ###
 
 A `ResourcePackage` instance may be constructed to use a `Supplier` to decide the locale automatically, hence `Locale::getDefault` is the natural choice which works well. But it is possible always to ask for a specific `Locale` instead. Putting the pieces together, a language selection menu could be rendered with similar code:
@@ -128,10 +148,10 @@ To mitigate these dangers, we provide resource discovery. The idea is that the s
 ```{java}
 @ResourceStockpile
 enum Titles implements ConstantString {
-    @ResourceDefinition("Mr.") MR,
-    @ResourceDefinition("Ms.") MS,
-    @ResourceDefinition("Mrs.") MRS,
-    @ResourceDefinition("Miss") MISS;    
+    @ResourceString("Mr.") MR,
+    @ResourceString("Ms.") MS,
+    @ResourceString("Mrs.") MRS,
+    @ResourceString("Miss") MISS;    
 }
 
 // The loading the resource package

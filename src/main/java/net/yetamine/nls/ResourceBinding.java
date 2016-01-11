@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 /**
  * A resource with bound operands, so that it is ready for rendering, although
- * retaining the possibility to switch the resource supplier before doing so.
+ * retaining the possibility to switch the resource provider before doing so.
  *
  * @param <T>
  *            the type of the result
@@ -15,7 +15,7 @@ import java.util.function.Function;
 public final class ResourceBinding<T> implements Function<Locale, T> {
 
     /** Resource resolving function. */
-    private final Function<ResourceSupplier, T> resolver;
+    private final Function<ResourceProvider, T> resolver;
     /** Source of the resource to be applied. */
     private final ResourcePackage source;
 
@@ -28,7 +28,7 @@ public final class ResourceBinding<T> implements Function<Locale, T> {
      *            the resolver of the resource with the respect to the source.
      *            It must not be {@code null}.
      */
-    public ResourceBinding(ResourcePackage resourceSource, Function<ResourceSupplier, T> resourceResolver) {
+    public ResourceBinding(ResourcePackage resourceSource, Function<ResourceProvider, T> resourceResolver) {
         resolver = Objects.requireNonNull(resourceResolver);
         source = Objects.requireNonNull(resourceSource);
     }

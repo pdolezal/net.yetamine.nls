@@ -20,20 +20,13 @@ public interface DecimalTemplate extends DoubleFunction<String> {
      * resolved to a {@link DecimalTemplate}.
      */
     @FunctionalInterface
-    interface Reference extends ResourceReference<DecimalTemplate> {
+    interface Reference extends ResourceObject<DecimalTemplate> {
 
         /**
-         * @see net.yetamine.nls.ResourceReference#use(net.yetamine.nls.ResourceSupplier)
+         * @see net.yetamine.nls.ResourceReference#use(net.yetamine.nls.ResourceProvider)
          */
-        default DecimalTemplate use(ResourceSupplier resources) {
+        default DecimalTemplate use(ResourceProvider resources) {
             return resources.decimal(name());
-        }
-
-        /**
-         * @see net.yetamine.nls.ResourceReference#use()
-         */
-        default DecimalTemplate use() {
-            return use(ResourceContext.require());
         }
 
         /**
