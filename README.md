@@ -96,7 +96,7 @@ for (Title title : Title.values()) {
 
 String-based resources are the most common case of resources that therefore they have special support for easier use. Besides that, they are special because they are often stored in text files like Java properties or XML documents and they can be often dealt with by non-developers as well. Object resources differ: they can't be stored in such a natural way, they need more programmatic support (and therefore developers to mantain them) etc. Fortunately, they are so rare.
 
-However, even for rare cases it is quite good to have at least some support for them. Actually, all string-based resources described above have a relationship to object resources, employing the `ResourceObject` interface. For other resource than these standard string-based resources, arbitrary instances of the `ResourceObject` instances can be created. Object resources have one outstanding specific: their definitions may employ a fallback that is hardwired in the code, therefore the code can be runnable even when no resources are available. This may be often desired with the respect to the nature of object resources.
+However, even for rare cases it is quite good to have at least some support if possible. Actually, all string-based resources described above have a relationship to object resources, employing the `ResourceObject` interface. For the resources other than these standard string-based resources, arbitrary instances of the `ResourceObject` can be created. Object resources exploit by default one special trait: their definitions may employ a fallback that is hardwired in the code, therefore the code can be runnable even when no (external) resources are available. This may be often desired with the respect to the nature of object resources.
 
 One outstanding case of real use of an object resource in JDK is related to `java.awt.ComponentOrientation`. Here is an example of dealing with such a resource using our object resources:
 
@@ -155,10 +155,10 @@ enum Titles implements StringConstant {
 }
 
 // The loading the resource package
-static final ResourcePackage RESOURCES = ResourceBundleProvider.discover(MethodHandles.lookup(), Title.class);
+ResourcePackage resources  = ResourceBundleProvider.discover(MethodHandles.lookup(), Title.class);
 ``` 
 
-The discovery can even aggregate resources from multiple classes into a single resource package, so that it is possible to have multiple `enum`s for different purposes and "implementing" different resource types, while the clients use a single common resource package without being aware of such split. The approach works for usual constant as well (i.e., there is absolutely no requirement to use `enum`s only). 
+The discovery can even aggregate resources from multiple classes into a single resource package, so that it is possible to have multiple `enum`s for different purposes and "implementing" different resource types, while the clients use a single common resource package without being aware of such split. The approach works for usual constants as well (i.e., there is absolutely no requirement to use `enum`s only). 
 
 The discovery enables yet another interesting possibility: the template for translating the resources to other languages can be generated from the sources (well, the tool might be some next project), which we consider to be a better solution than occasional reverse approach when the source code with the resource references is generated from a resource.
 
@@ -168,16 +168,16 @@ The discovery enables yet another interesting possibility: the template for tran
 Since any façade is another layer of indirection, it introduces some (mild) overhead. Direct getting a `ResourceBundle` instance and using it might be a bit faster, but at the cost of less readable code. Another consideration is laziness: this library is as lazy as possible by default and delays both loading a resource and producing any result already on the façade level until the resolution is inevitable. This is especially useful for making various error and logging messages that are a subject of a condition. For the cases when a resource bundle is repeated multiple times in a sequence, it is always possible to request a fully resolved instance; the resource context technique with try-with-resources actually uses the full resolution automatically, therefore comfortable use goes alongside with better performance.
 
 
-## Prerequisites ##
-
-For building this project is needed:
-
-* JDK 8 or newer.
-* Maven 3.3 or newer.
+## Using and building ##
 
 For using the built library is needed:
 
 * JRE 8 or newer.
+
+For building this project from sources is needed:
+
+* JDK 8 or newer.
+* Maven 3.3 or newer.
 
 
 ## Licensing ##
