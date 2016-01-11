@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * A local resource context.
+ * A local resource context which is bound to an implicit resource supplier.
  *
  * <p>
  * This class is designed for easier reusing the same supplier in a local code

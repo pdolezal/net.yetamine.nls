@@ -9,11 +9,12 @@ import java.util.function.Supplier;
  *
  * <p>
  * The interface design anticipates lazy resolution implementations that do not
- * resolve the resource until it is actually needed and must be provided. While
- * this approach is useful for occasional uses (for instance, when an exception
- * shall be thrown and the error message is resolved with a callback), it is not
- * very efficient for a sequence of resolutions. This scenario is supported with
- * {@link #resolve()} that returns a fully resolved instance.
+ * resolve the resource until the resource is actually required and therefore it
+ * must be resolved. While this approach is useful for occasional uses (e.g.,
+ * when an exception shall be thrown and the error message is resolved with a
+ * callback), it is not very efficient for a sequence of uses. For such cases,
+ * the {@link #resolve()} method, which returns a fully resolved instance, can
+ * be used to get a fully resolved instance.
  */
 public interface ResourcePackage extends ResourceSupplier {
 
@@ -36,9 +37,9 @@ public interface ResourcePackage extends ResourceSupplier {
      * <pre>
      * // Assuming 'resources' contain an unresolved instance:
      * final ResourcePackage r = resources.resolve();
-     * final String message = Greetings.HELLO.from(r).with(Titles.MR.from(r).with("Smith"));
+     * final String message = Greetings.HELLO.use(r).with(Titles.MR.use(r).with("Smith"));
      * // Without using this method, the output would be usually the same, but
-     * // the resolution process could be repeated twice unncessarily.
+     * // the resolution process could be repeated twice unnecessarily.
      * </pre>
      *
      * @return a fully resolved resource package representation, possibly this
@@ -86,7 +87,17 @@ public interface ResourcePackage extends ResourceSupplier {
     Locale locale();
 
     /**
-     * A factory interface for {@link ResourcePackage}.
+     * The default implementation uses a resolved form of this instance to make
+     * the context.
+     *
+     * @see net.yetamine.nls.ResourceSupplier#context()
+     */
+    default ResourceContext context() {
+        return ResourceContext.open(resolve());
+    }
+
+    /**
+     * A factory interface for {@link ResourcePackage}
      */
     @FunctionalInterface
     interface Factory {
@@ -148,15 +159,5 @@ public interface ResourcePackage extends ResourceSupplier {
         default ResourcePackage resolve(String name, Locale locale) {
             return bind(name, locale).resolve();
         }
-    }
-
-    /**
-     * The default implementation uses a resolved form of this instance to make
-     * the context.
-     *
-     * @see net.yetamine.nls.ResourceSupplier#context()
-     */
-    default ResourceContext context() {
-        return ResourceContext.open(resolve());
     }
 }

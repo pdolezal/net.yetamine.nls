@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a resource definition for automated resource bundle generation.
+ * Marks a resource definition for resource discovery.
  *
  * <p>
  * The annotation should be applied on a {@code public static final} field (that
@@ -25,8 +25,8 @@ public @interface ResourceDefinition {
      * Returns the default content of the resource.
      *
      * <p>
-     * The format of the content is implied by the context, e.g., it may be
-     * indicated by {@link ResourceDefinition} annotation on the enclosing
+     * The format of the content is implied by the definition context, e.g., it
+     * may be indicated by {@link ResourceStockpile} annotation on the enclosing
      * class.
      *
      * @return the default content of the resource
@@ -36,8 +36,15 @@ public @interface ResourceDefinition {
     /**
      * Returns the name of the resource.
      *
+     * <p>
+     * This attribute should be used when for some reason the automatic name
+     * resolution can't work, e.g., the annotated field holds no instance of
+     * {@link ResourceReference}, but rather an object to be used for retrieving
+     * the resource directly, or when a tool extracting the data directly from a
+     * class file shall be used for assembling the resource package etc.
+     *
      * @return the name of the resource, or an empty string if the name shall
-     *         override the name implied by the resource constant itself
+     *         not override the name implied by the resource constant itself
      */
     String name() default "";
 }

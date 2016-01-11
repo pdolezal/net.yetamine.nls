@@ -1,15 +1,17 @@
 # net.yetamine.nls #
 
-This repository provides a library that offers a more fluent interface for retrieving localized messages than the common `ResourceBundle`. The library replaces `ResourceBundle` with no own implementation, rather provides a façade for more alternatives. `ResourceBundle` is just one of possibilities, which is available out of the box.
+This repository provides a library that offers a more fluent interface for retrieving localized messages than the common `ResourceBundle`. The library does not replace `ResourceBundle` with any own implementation, it rather provides a façade for more alternatives. `ResourceBundle` is just one of possibilities, which is available out of the box.
 
-Notable fact is that the library uses pure Java and just the runtime libraries, no deep magic, no dependency injection, no library nor framework dependency, therefore it might be especially interesting for the code that should be as portable as possible and be adaptable for various frameworks and their localization infrastructure.
+Notable fact is that the library uses pure Java and just the runtime libraries, no dependency injection, no library nor framework dependency, therefore it might be especially interesting for the code that should be as portable as possible and be adaptable for various frameworks and their localization infrastructure.
 
 
 ## Library design ##
 
-A resource bundle analogue is provided as the `ResourcePackage` interface. The interface serves as a factory for the most common resource types: a constant string, a message template and a numeric template. The role of a rich resource identifier in the source have their "reference" counter-parts.
+A resource bundle analogue is provided as the `ResourcePackage` interface (or in most cases using its more limited parent, `ResourceSupplier`, is sufficient). This interface serves as a factory for all supported resource types: a constant string, a message template and a numeric template. Resource reference exist as companions of the resource types in order to enable comfortable access to the resources.
 
-Combined together, the client code uses just a mechanism-agnostic resource references and uses an externally supplied resource packages to resolve the resources. Because the resource package is an interface that does not require much, nor specifies any class loader details, it can hide much more easily alternative means like external resources even without using any `ResourceBundle` if not suitable, or even combining more means together.
+The client code uses just a mechanism-agnostic resource references and uses an externally supplied resource packages to resolve the resources. Because the resource package is an interface that does not require much, nor specifies any class loader details, it can hide much more easily alternative means like external resources even without using any `ResourceBundle` if not suitable, or even combining more means together.
+
+As you can see, object resources are not supported. Object resources seem to be used too rarely to really bother with them, so omitting their support is a deliberate design decision made in order to balance the requirements, complexity and the amount of commonly used functionality.
 
 For better understanding the implications of the design, see examples below.
 
@@ -36,12 +38,12 @@ final class Messages {
 }
 ```
 
-It is a bit richer than a plain string constant with the identifier of a resource, but hopefully not as bad.
+It is a bit more verbose than a plain string constant with the identifier of a resource, but hopefully not as bad.
 
 
 ### Using the resource references ###
 
-When we have some resource references, we would like to use them. Let's assume that `RESOURCES` contains a reference to a `ResourcePackage` instance (how to get it would be covered later) and `remaining` is a numeric variable with the number of remaining days. Then following code snippet a message like *Hello Peter, your subscription remains valid for 1 day.* Or perhaps with a different locale: *Halo, Peter, Dein Abonnement läuft in einem Tag ab.*:
+When we have some resource references, we would like to use them. Let's assume that `RESOURCES` contains a reference to a `ResourceSupplier` instance (how to get it would be covered later) and `remaining` is an acceptable numeric variable with the number of remaining days. Then following code snippet a message like *Hello Peter, your subscription remains valid for 1 day.* Or perhaps with a different locale: *Halo, Peter, Dein Abonnement läuft in einem Tag ab.*:
 
 ```{java}
 // Produces properly formatted day amount, e.g., "1 day" or "2 days". 
@@ -139,6 +141,11 @@ static final ResourcePackage RESOURCES = ResourceBundleProvider.discover(MethodH
 The discovery can even aggregate resources from multiple classes into a single resource package, so that it is possible to have multiple `enum`s for different purposes and "implementing" different resource types, while the clients use a single common resource package without being aware of such split. The approach works for usual constant as well (i.e., there is absolutely no requirement to use `enum`s only). 
 
 The discovery enables yet another interesting possibility: the template for translating the resources to other languages can be generated from the sources (well, the tool might be some next project), which we consider to be a better solution than occasional reverse approach when the source code with the resource references is generated from a resource.
+
+
+### How much does it cost? ###
+
+Since any façade is another layer of indirection, it introduces some (mild) overhead. Direct getting a `ResourceBundle` instance and using it might be a bit faster, but at the cost of less readable code. Another consideration is laziness: this library is as lazy as possible by default and delays both loading a resource and producing any result already on the façade level until the resolution is inevitable. This is especially useful for making various error and logging messages that are a subject of a condition. For the cases when a resource bundle is repeated multiple times in a sequence, it is always possible to request a fully resolved instance; the resource context technique with try-with-resources actually uses the full resolution automatically, therefore comfortable use goes alongside with better performance.
 
 
 ## Prerequisites ##

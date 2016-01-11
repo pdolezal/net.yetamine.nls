@@ -3,7 +3,7 @@ package net.yetamine.nls;
 import java.util.MissingResourceException;
 
 /**
- * Represents a reference to a resource with the given.
+ * Represents a reference to a resource with the given name.
  *
  * @param <T>
  *            the type of the resource
@@ -11,7 +11,7 @@ import java.util.MissingResourceException;
 public interface ResourceReference<T> {
 
     /**
-     * Returns the name of the resource (its identifier).
+     * Returns the name of the resource.
      *
      * <p>
      * This method uses intentionally the same name as {@link Enum#name()}, so
@@ -26,7 +26,7 @@ public interface ResourceReference<T> {
      *
      * // Then, assuming 'resources' contain such resources, it is possible just
      * // to get the values and format them immediately:
-     * Titles.MR.from(resources).with("Smith");
+     * Titles.MR.use(resources).with("Smith");
      *
      * // The results could be, e.g., "Mr. Smith" or "Herr Smith" (depending on
      * // the 'resources' implementation and settings like the actual locale).
@@ -50,14 +50,16 @@ public interface ResourceReference<T> {
     T use(ResourceSupplier resources);
 
     /**
-     * Retrieves the resource from the current context supplier.
+     * Retrieves the resource from the current implicit supplier.
      *
      * @return the resource
      *
      * @throws IllegalStateException
-     *             if no context is available at this moment
+     *             if no implicit supplier is available at this moment
      * @throws MissingResourceException
      *             if the resource could not be retrieved
+     *
+     * @see ResourceSupplier#context()
      */
     T use();
 }

@@ -2,10 +2,27 @@ package net.yetamine.nls;
 
 import java.text.ChoiceFormat;
 import java.text.MessageFormat;
+import java.util.MissingResourceException;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * A source of templates and strings.
+ * A resource supplier interface.
+ *
+ * <p>
+ * This interface is the core interface of the whole library as it encapsulates
+ * a source of resources for other parts of the library and for clients as well.
+ * The design of this interface assumes that all resources are representable as
+ * strings and all related resources are parsed from the strings. Because of
+ * that, {@link #string(String)} is supposed to be the common denominator of
+ * other methods, providing the string data for creating resources of other
+ * types.
+ *
+ * <p>
+ * However, this assumption does not prevent an implementation from parsing the
+ * string representation of a resource once and reusing it later. Other options,
+ * like separated resource types, are possible as well, but those must be then
+ * reflected when using the resource discovery feature.
  */
 public interface ResourceSupplier {
 
@@ -18,21 +35,57 @@ public interface ResourceSupplier {
      *            the name of the resource. It must not be {@code null}.
      *
      * @return the string content of the resource
+     *
+     * @throws MissingResourceException
+     *             if the resource could not be retrieved
      */
     String string(String name);
+
+    /**
+     * Parses a resource with the given constructor function in a value of
+     * different type.
+     *
+     * <p>
+     * While this interface does not intentionally support object resources
+     * directly, this method provides a way to reach a similar functionality.
+     * The major advantage of this approach is that the client code has the full
+     * control of the resource processing and does not have to rely on any magic
+     * features of the resource system, which could vary with the underlying
+     * implementation.
+     *
+     * @param <T>
+     *            the type of the result
+     * @param name
+     *            the name of the resource. It must not be {@code null}.
+     * @param constructor
+     *            the constructing function that parses the resource string and
+     *            returns the result. It must not be {@code null}.
+     *
+     * @return the result of the constructor function
+     *
+     * @throws MissingResourceException
+     *             if the resource could not be retrieved
+     */
+    default <T> T value(String name, Function<? super String, ? extends T> constructor) {
+        return constructor.apply(string(name));
+    }
 
     /**
      * Constructs a template from a resource with the given name and returns the
      * template.
      *
      * <p>
-     * The default implementation is based on {@link ChoiceFormat} while using
-     * {@link #string(String)} to load the formatting pattern.
+     * The default implementation uses {@link #value(String, Function)} to parse
+     * the string into a {@link ChoiceFormat} which then performs the actual
+     * formatting of the template.
      *
      * @param name
      *            the name of the resource. It must not be {@code null}.
      *
      * @return the template
+     *
+     * @throws MissingResourceException
+     *             if the resource could not be retrieved
      */
     default DecimalTemplate decimal(String name) {
         return value -> new ChoiceFormat(string(name)).format(value);
@@ -43,8 +96,9 @@ public interface ResourceSupplier {
      * template.
      *
      * <p>
-     * The default implementation is based on {@link ChoiceFormat} while using
-     * {@link #string(String)} to load the formatting pattern.
+     * The default implementation uses {@link #value(String, Function)} to parse
+     * the string into a {@link ChoiceFormat} which then performs the actual
+     * formatting of the template.
      *
      * @param name
      *            the name of the resource. It must not be {@code null}.
@@ -60,8 +114,9 @@ public interface ResourceSupplier {
      * template.
      *
      * <p>
-     * The default implementation is based on {@link MessageFormat} while using
-     * {@link #string(String)} to load the formatting pattern.
+     * The default implementation uses {@link #string(String)} to retrive the
+     * pattern for {@link MessageFormat} which then performs the actual
+     * formatting of the template.
      *
      * @param name
      *            the name of the resource. It must not be {@code null}.
@@ -72,42 +127,53 @@ public interface ResourceSupplier {
         return args -> MessageFormat.format(string(name), args);
     }
 
+    // Resource context support
+
     /**
-     * Establishes a local context for this supplier.
+     * Opens a resource context for this supplier, making it the current
+     * implicit supplier.
      *
-     * @return the established context
+     * <p>
+     * This method should be used in the following way:
+     *
+     * <pre>
+     * try (ResourceContext rc = resourceSupplier.context()) {
+     *     // Here 'resourceSupplier' is the implicit resource supplier
+     * }
+     * </pre>
+     *
+     * @return the context for this supplier
      */
     default ResourceContext context() {
         return ResourceContext.open(this);
     }
 
     /**
-     * Returns a result of the specified supplier that may use
-     * {@link #context()} of this instance implicitly.
+     * Returns a result of the specified supplier that is invoked within the
+     * {@link #context()} of this instance.
      *
      * @param <T>
      *            the type of the result
-     * @param s
+     * @param supplier
      *            the supplier to execute. It must not be {@code null}.
      *
      * @return the result of the supplier
      */
-    default <T> T supply(Supplier<? extends T> s) {
+    default <T> T supply(Supplier<? extends T> supplier) {
         try (ResourceContext context = context()) {
-            return s.get();
+            return supplier.get();
         }
     }
 
     /**
-     * Executes the given operation may use {@link #context()} of this instance
-     * implicitly.
+     * Executes the given action within the {@link #context()} of this instance.
      *
-     * @param r
-     *            the operation to execute. It must not be {@code null}.
+     * @param action
+     *            the action to execute. It must not be {@code null}.
      */
-    default void execute(Runnable r) {
+    default void execute(Runnable action) {
         try (ResourceContext context = context()) {
-            r.run();
+            action.run();
         }
     }
 }

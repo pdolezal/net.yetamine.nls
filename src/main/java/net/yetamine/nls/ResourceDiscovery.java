@@ -13,7 +13,18 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * A builder for resources using annotations to read the resource definitions.
+ * A support for building resource packages from annotated classes providing the
+ * resource definitions.
+ *
+ * <p>
+ * Following code snippet demonstrates the typical use of this class:
+ *
+ * <pre>
+ * final Map&gt;String, String&lt; map = new HashMap&gt;&lt;(); // The map with the retrieved resources
+ * final ResourceDiscovery discovery = new ResourceDiscovery(map::put).lookup(MethodHandles.lookup());
+ * discovery.add(clazz); // Assuming: discovery.test(clazz) == true
+ * // Now 'map' contains the discovered resources for 'clazz'
+ * </pre>
  */
 public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Class<?>> {
 

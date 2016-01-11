@@ -88,6 +88,12 @@ public final class ResourceBundleProvider {
      * the first given class's loader for subsequent loading operations, to find
      * all resources and make a fallback bundle of them.
      *
+     * <p>
+     * Note that the implementation uses {@code assert} to check the duplication
+     * of found entries, so that a duplication should be detected in a testing
+     * environment, but should not cause fatal problems in production (unless a
+     * misformatted message is a fatal problem).
+     *
      * @param lookup
      *            the lookup object to use for reading the fields with the
      *            resource definitions. It may be {@code null} if reflective
@@ -107,7 +113,11 @@ public final class ResourceBundleProvider {
      */
     public static ResourcePackage discover(MethodHandles.Lookup lookup, Class<?> clazz, Class<?>... classes) {
         final Map<String, String> map = new HashMap<>(); // The map with the actual resources
-        final ResourceDiscovery discovery = new ResourceDiscovery(map::put).lookup(lookup);
+        final ResourceDiscovery discovery = new ResourceDiscovery((k, v) -> {
+            final String previous = map.put(k, v);
+            assert (previous == null) : String.format("Detected duplicated key '%s'.", k);
+        }).lookup(lookup);
+
         if (discovery.test(clazz)) { // The umbrella class may be omitted from inspection
             discovery.add(clazz);
         }

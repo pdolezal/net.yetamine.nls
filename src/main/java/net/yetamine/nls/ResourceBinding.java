@@ -6,8 +6,8 @@ import java.util.Objects;
 import java.util.function.Function;
 
 /**
- * A bound resource to be rendered, but with the possibility of switching the
- * resource.
+ * A resource with bound operands, so that it is ready for rendering, although
+ * retaining the possibility to switch the resource supplier before doing so.
  */
 public final class ResourceBinding implements Function<Locale, String> {
 
