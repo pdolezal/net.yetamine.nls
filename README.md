@@ -68,7 +68,7 @@ Leaving out the repeated references to `RESOURCES` leads to more compact code. T
 Declaring the resource references in the original way works, but still is not very appealing. There are several other ways how to improve it; using an `enum` is quite usual, but maybe not in this way: 
 
 ```{java}
-enum Title implements ConstantString {
+enum Title implements StringConstant {
     MR, MS, MRS, MISS;
 }
 ```
@@ -147,7 +147,7 @@ To mitigate these dangers, we provide resource discovery. The idea is that the s
 
 ```{java}
 @ResourceStockpile
-enum Titles implements ConstantString {
+enum Titles implements StringConstant {
     @ResourceString("Mr.") MR,
     @ResourceString("Ms.") MS,
     @ResourceString("Mrs.") MRS,

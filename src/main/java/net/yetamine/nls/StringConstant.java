@@ -6,7 +6,7 @@ import java.util.Objects;
  * Represents a constant string provided as a resource with the given name.
  */
 @FunctionalInterface
-public interface ConstantString extends ResourceObject<String> {
+public interface StringConstant extends ResourceObject<String> {
 
     /**
      * @see net.yetamine.nls.ResourceReference#use(net.yetamine.nls.ResourceProvider)
@@ -23,7 +23,7 @@ public interface ConstantString extends ResourceObject<String> {
      *
      * @return the new instance
      */
-    static ConstantString name(String name) {
+    static StringConstant name(String name) {
         Objects.requireNonNull(name);
         return () -> name;
     }
