@@ -23,9 +23,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-	    <groupId>net.yetamine</groupId>
-	    <artifactId>net.yetamine</artifactId>
-	    <version>3.0.2</version>
+        <groupId>net.yetamine</groupId>
+        <artifactId>artifact-osgi</artifactId>
+        <version>1.0.0</version>
     </parent>
 
     <groupId>net.yetamine</groupId>
