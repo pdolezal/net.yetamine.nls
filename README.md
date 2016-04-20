@@ -28,10 +28,10 @@ final class Messages {
 
     // text = Hello {0}, your subscription remains valid for {1} {2}.
     public static final MessageTemplate.Reference TEXT = MessageTemplate.Reference.to("text");
-    
+
     // days = 0#days|1#day|2<days
     public static final IntegerTemplate.Reference DAYS = IntegerTemplate.Reference.to("days");
-    
+
     …
 }
 ```
@@ -151,7 +151,7 @@ enum Titles implements StringConstant {
     @ResourceString("Mr.") MR,
     @ResourceString("Ms.") MS,
     @ResourceString("Mrs.") MRS,
-    @ResourceString("Miss") MISS;    
+    @ResourceString("Miss") MISS;
 }
 
 // The loading the resource package
