@@ -50,17 +50,19 @@ public final class ResourceBinding<T> implements Function<Locale, T> {
     }
 
     /**
-     * The implementation uses {@link #apply()} to return the string and may
-     * return {@code null} if it fails with {@link MissingResourceException}.
+     * The implementation uses {@link #apply()} to return the string. If either
+     * {@code null} returns, or {@link MissingResourceException} raises, an
+     * empty string is returned rather than {@code null}, which this method
+     * should avoid.
      *
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
         try {
-            return Objects.toString(apply());
+            return Objects.toString(apply(), "");
         } catch (MissingResourceException e) {
-            return null;
+            return "";
         }
     }
 
