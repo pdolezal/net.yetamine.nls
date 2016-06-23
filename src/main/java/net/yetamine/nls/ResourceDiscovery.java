@@ -145,7 +145,7 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
         }
 
         // Cache the access control context for later invocations of adding fields
-        final AccessControlContext acc = (lookup != null) ? AccessController.getContext() : null;
+        final AccessControlContext acc = AccessController.getContext();
 
         Stream.of(clazz.getFields()).filter(field -> {
             final int modifiers = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
@@ -164,10 +164,11 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
      *            formatted.
      * @param acc
      *            the {@link AccessControlContext} for adding the field if not
-     *            using the lookup object. It must not be {@code null} if no
-     *            lookup is specified.
+     *            using the lookup object. It must not be {@code null}.
      */
     private void add(Field field, AccessControlContext acc) {
+        assert (acc != null);
+
         final ResourceString definition = field.getAnnotation(ResourceString.class);
         if (definition == null) { // Definition missing, not a resource
             return;
@@ -200,8 +201,7 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
      *            the field to read. It must not be {@code null}.
      * @param acc
      *            the {@link AccessControlContext} for adding the field if not
-     *            using the lookup object. It must not be {@code null} if no
-     *            lookup is specified.
+     *            using the lookup object. It must not be {@code null}.
      *
      * @return the field content
      *
@@ -211,22 +211,28 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
      *             if the access is disallowed
      */
     private Object readField(Field field, AccessControlContext acc) throws IllegalAccessException {
+        assert (acc != null);
+
         try {
-            if (lookup != null) { // Use the lookup object if available
-                return lookup.unreflectGetter(field).invoke();
+            try { // Try to access directly, which may be OK for accessible fields or correct lookup
+                return (lookup != null) ? lookup.unreflectGetter(field).invoke() : field.get(null);
+            } catch (IllegalAccessException e) {
+                // Well, if this is not possible after all, try the nuclear option
+                final PrivilegedExceptionAction<?> read = () -> {
+                    // Actually, we don't invoke this code if the field is accessible, but for the
+                    // peace of mind and more volatile shuffling with the field flag, let's try to
+                    // restore it after reading and no to keep it exposed
+                    final boolean accessible = field.isAccessible();
+                    field.setAccessible(true);
+                    try {
+                        return field.get(null);
+                    } finally {
+                        field.setAccessible(accessible);
+                    }
+                };
+
+                return AccessController.doPrivileged((PrivilegedExceptionAction<?>) read, acc);
             }
-
-            assert (acc != null); // Warning: using this method is state-dependent
-            final PrivilegedExceptionAction<?> read = () -> {
-                field.setAccessible(true);
-                try {
-                    return field.get(null);
-                } finally {
-                    field.setAccessible(false);
-                }
-            };
-
-            return AccessController.doPrivileged((PrivilegedExceptionAction<?>) read, acc);
         } catch (IllegalAccessException | RuntimeException | Error e) {
             throw e; // Let these propagate directly
         } catch (Throwable e) {
