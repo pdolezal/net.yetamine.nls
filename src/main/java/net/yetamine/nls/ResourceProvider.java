@@ -55,7 +55,7 @@ public interface ResourceProvider {
      * <p>
      * This method, unlike other resource-providing methods, does not throw an
      * exception if the object is missing, but rather returns {@code null}. It
-     * is not mentioned for direct use, but it provides rather a base for safe
+     * is not intended for direct use, but it provides rather a base for safe
      * access methods like {@link ResourceObject}.
      *
      * <p>

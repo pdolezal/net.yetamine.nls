@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * <p>
  * The annotated type should have no static initialization blocks with
  * side-effects or external dependencies that might provide loading its class in
- * isolation. The type should declare inidividual resources as constants (i.e.,
+ * isolation. The type should declare individual resources as constants (i.e.,
  * {@code public static final} fields) of {@link ResourceReference} type, being
  * annotated with {@link ResourceString}.
  *

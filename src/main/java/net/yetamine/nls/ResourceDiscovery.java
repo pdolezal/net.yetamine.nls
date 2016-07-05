@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  * Following code snippet demonstrates the typical use of this class:
  *
  * <pre>
- * final Map&gt;String, String&lt; map = new HashMap&gt;&lt;(); // The map with the retrieved resources
+ * final Map&lt;String, String&gt; map = new HashMap&lt;&gt;(); // The map with the retrieved resources
  * final ResourceDiscovery discovery = new ResourceDiscovery(map::put).lookup(MethodHandles.lookup());
  * discovery.add(clazz); // Assuming: discovery.test(clazz) == true
  * // Now 'map' contains the discovered resources for 'clazz'
