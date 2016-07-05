@@ -31,7 +31,7 @@ import java.util.function.Function;
 public final class ResourceBinding<T> implements Function<Locale, T> {
 
     /** Resource resolving function. */
-    private final Function<ResourceProvider, T> resolver;
+    private final Function<? super ResourceProvider, ? extends T> resolver;
     /** Source of the resource to be applied. */
     private final ResourcePackage source;
 
@@ -44,7 +44,7 @@ public final class ResourceBinding<T> implements Function<Locale, T> {
      *            the resolver of the resource with the respect to the source.
      *            It must not be {@code null}.
      */
-    public ResourceBinding(ResourcePackage resourceSource, Function<ResourceProvider, T> resourceResolver) {
+    public ResourceBinding(ResourcePackage resourceSource, Function<? super ResourceProvider, ? extends T> resourceResolver) {
         resolver = Objects.requireNonNull(resourceResolver);
         source = Objects.requireNonNull(resourceSource);
     }
