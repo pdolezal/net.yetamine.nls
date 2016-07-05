@@ -49,6 +49,14 @@ public final class MapResourceBundle extends ResourceBundle {
     }
 
     /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return String.format("MapResourceBundle[%s]", getBaseBundleName());
+    }
+
+    /**
      * @see java.util.ResourceBundle#handleGetObject(java.lang.String)
      */
     @Override

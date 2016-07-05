@@ -48,6 +48,14 @@ final class ResourceBundleBridge implements ResourcePackage {
     }
 
     /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return String.format("ResourceBundleBridge[%s]", name());
+    }
+
+    /**
      * @see net.yetamine.nls.ResourcePackage#name()
      */
     public String name() {

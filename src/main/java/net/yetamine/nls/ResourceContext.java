@@ -122,6 +122,14 @@ public final class ResourceContext implements AutoCloseable, Supplier<ResourcePr
     }
 
     /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return String.format("ResourceContext[%s]", provider);
+    }
+
+    /**
      * Returns the provider bound to this context.
      *
      * @see java.util.function.Supplier#get()

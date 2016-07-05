@@ -41,6 +41,14 @@ final class ResourceBundleAdapter implements ResourceProvider {
     }
 
     /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return String.format("ResourceBundleAdapter[%s]", name());
+    }
+
+    /**
      * @see net.yetamine.nls.ResourceProvider#name()
      */
     public String name() {

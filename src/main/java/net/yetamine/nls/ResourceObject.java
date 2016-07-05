@@ -158,6 +158,14 @@ final class DefaultResourceObject<T> implements ResourceObject<T> {
     }
 
     /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return String.format("ResourceObject[%s]", name);
+    }
+
+    /**
      * @see net.yetamine.nls.ResourceReference#name()
      */
     public String name() {
