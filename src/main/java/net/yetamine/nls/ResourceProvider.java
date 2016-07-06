@@ -19,6 +19,7 @@ package net.yetamine.nls;
 import java.text.ChoiceFormat;
 import java.text.MessageFormat;
 import java.util.MissingResourceException;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -53,12 +54,6 @@ public interface ResourceProvider {
      * Retrieves a resource object of the given type.
      *
      * <p>
-     * This method, unlike other resource-providing methods, does not throw an
-     * exception if the object is missing, but rather returns {@code null}. It
-     * is not intended for direct use, but it provides rather a base for safe
-     * access methods like {@link ResourceObject}.
-     *
-     * <p>
      * Note that the method or underlying implementation may not be able to
      * avoid unchecked casts or other type verifications, hence it is not a
      * completely type-safe option. Therefore {@link ClassCastException} may
@@ -69,7 +64,10 @@ public interface ResourceProvider {
      * @param name
      *            the name of the resource. It must not be {@code null}.
      *
-     * @return the resource object, or {@code null} if missing
+     * @return the resource object
+     *
+     * @throws MissingResourceException
+     *             if the resource could not be retrieved
      */
     <T> T object(String name);
 
@@ -127,6 +125,34 @@ public interface ResourceProvider {
      * @return {@code true} iff a resoure of the given name does exist
      */
     boolean provides(String name);
+
+    /**
+     * Attempts to retrieve the resource with the given name.
+     *
+     * <p>
+     * Unlike other resource-retrieving methods, this method rather returns an
+     * empty {@link Optional} if the resource could not be found, leaving the
+     * resolution of the failure to the caller fully. The result allows other
+     * comfortable operations like mapping the resource to a different type etc.
+     *
+     * @param name
+     *            the name of the resource. It must not be {@code null}.
+     *
+     * @return the resource, or an empty {@link Optional} if the resource is
+     *         missing
+     */
+    default Optional<?> lookup(String name) {
+        if (provides(name)) {
+            try {
+                return Optional.ofNullable(object(name));
+            } catch (MissingResourceException e) {
+                // Ignore the error, go for empty; this is a safety block to
+                // avoid problems with not-so-good implementations
+            }
+        }
+
+        return Optional.empty();
+    }
 
     // Template support
 
