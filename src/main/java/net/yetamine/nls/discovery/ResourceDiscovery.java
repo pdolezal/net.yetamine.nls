@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.yetamine.nls;
+package net.yetamine.nls.discovery;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -27,6 +27,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import net.yetamine.nls.ResourceReference;
 
 /**
  * A support for building resource packages from annotated classes providing the

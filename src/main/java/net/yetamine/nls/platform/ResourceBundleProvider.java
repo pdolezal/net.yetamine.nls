@@ -23,9 +23,9 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
-import net.yetamine.nls.ResourceDiscovery;
 import net.yetamine.nls.ResourcePackage;
 import net.yetamine.nls.ResourceProvider;
+import net.yetamine.nls.discovery.ResourceDiscovery;
 
 /**
  * The provider of the implementation based on {@link ResourceBundle} support.

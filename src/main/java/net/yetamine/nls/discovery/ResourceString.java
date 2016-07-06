@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package net.yetamine.nls;
+package net.yetamine.nls.discovery;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import net.yetamine.nls.ResourceReference;
 
 /**
  * Marks a resource definition for resource discovery.
