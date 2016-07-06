@@ -56,6 +56,13 @@ final class ResourceBundleAdapter implements ResourceProvider {
     }
 
     /**
+     * @see net.yetamine.nls.ResourceProvider#provides(java.lang.String)
+     */
+    public boolean provides(String name) {
+        return bundle.containsKey(name);
+    }
+
+    /**
      * @see net.yetamine.nls.ResourceProvider#object(java.lang.String)
      */
     @SuppressWarnings("unchecked")

@@ -118,6 +118,19 @@ public interface ResourceProvider {
     }
 
     /**
+     * Indicates whether this resource source provides any resource of the given
+     * name.
+     *
+     * @param name
+     *            the name of the resource. It must not be {@code null}.
+     *
+     * @return {@code true} iff a resoure of the given name does exist
+     */
+    boolean provides(String name);
+
+    // Template support
+
+    /**
      * Constructs a template from a resource with the given name and returns the
      * template.
      *

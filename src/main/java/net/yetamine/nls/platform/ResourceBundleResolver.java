@@ -89,6 +89,13 @@ final class ResourceBundleResolver implements ResourcePackage {
     }
 
     /**
+     * @see net.yetamine.nls.ResourceProvider#provides(java.lang.String)
+     */
+    public boolean provides(String identifier) {
+        return loader.load(name(), locale()).containsKey(identifier);
+    }
+
+    /**
      * @see net.yetamine.nls.ResourceProvider#object(java.lang.String)
      */
     @SuppressWarnings("unchecked")
