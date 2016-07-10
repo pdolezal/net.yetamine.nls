@@ -91,12 +91,11 @@ public interface ResourceProvider {
      * different type.
      *
      * <p>
-     * While this interface does not intentionally support object resources
-     * directly, this method provides a way to reach a similar functionality.
-     * The major advantage of this approach is that the client code has the full
-     * control of the resource processing and does not have to rely on any magic
-     * features of the resource system, which could vary with the underlying
-     * implementation.
+     * Providing objects as resources is not very usual and it may be tricky or
+     * have some limitations. In some cases, a conversion from the textual form
+     * into the object form can be a more convenient way and provides the full
+     * control of the object retrieval to the client. This is what this method
+     * offers.
      *
      * @param <T>
      *            the type of the result
