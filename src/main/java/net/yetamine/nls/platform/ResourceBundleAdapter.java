@@ -16,7 +16,6 @@
 
 package net.yetamine.nls.platform;
 
-import java.util.MissingResourceException;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -67,11 +66,7 @@ final class ResourceBundleAdapter implements ResourceProvider {
      */
     @SuppressWarnings("unchecked")
     public <T> T object(String name) {
-        try {
-            return (T) bundle.getObject(name);
-        } catch (MissingResourceException e) {
-            return null;
-        }
+        return (T) bundle.getObject(name);
     }
 
     /**
