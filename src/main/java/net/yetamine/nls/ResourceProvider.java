@@ -51,7 +51,7 @@ public interface ResourceProvider {
     String name();
 
     /**
-     * Retrieves a resource object of the given type.
+     * Retrieves a resource object.
      *
      * <p>
      * Note that the method or underlying implementation may not be able to
@@ -70,6 +70,39 @@ public interface ResourceProvider {
      *             if the resource could not be retrieved
      */
     <T> T object(String name);
+
+    /**
+     * Retrieves a resource object of the given type.
+     *
+     * <p>
+     * Unlike {@link #object(String)}, this method does perform a type check
+     * before returning the result, throwing {@link MissingResourceException}
+     * rather than {@link ClassCastException} if the desired type does not match
+     * the type of the actual resource.
+     *
+     * @param <T>
+     *            the type of the resource object
+     * @param name
+     *            the name of the resource. It must not be {@code null}.
+     * @param type
+     *            the desired type of the resource. It must not be {@code null}.
+     *
+     * @return the resource object
+     *
+     * @throws MissingResourceException
+     *             if the resource could not be retrieved, or its type is wrong
+     */
+    default <T> T object(String name, Class<T> type) {
+        final Object result = object(name);
+        try { // Try casting to the desired type
+            return type.cast(result);
+        } catch (ClassCastException e) {
+            final String f = "Unable to cast resource '%s' to type '%s'.";
+            final MissingResourceException t = new MissingResourceException(String.format(f, name, type), name(), name);
+            t.initCause(e);
+            throw t;
+        }
+    }
 
     /**
      * Retrieves a resource of the given name and returns it as a {@link String}
