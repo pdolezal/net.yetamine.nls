@@ -135,7 +135,7 @@ public final class ResourceBundleProvider {
         }).lookup(lookup);
 
         if (discovery.test(clazz)) { // The umbrella class may be omitted from inspection
-            discovery.add(clazz);
+            discovery.inspect(clazz);
         }
 
         Stream.of(classes).forEach(discovery); // Inspect all other given classes, these must pass the test

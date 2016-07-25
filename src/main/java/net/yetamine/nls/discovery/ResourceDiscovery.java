@@ -44,7 +44,7 @@ import net.yetamine.nls.ResourceReference;
  * // Now 'map' contains the discovered resources for 'clazz'
  * </pre>
  */
-public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Class<?>> {
+public final class ResourceDiscovery implements Consumer<Class<?>> {
 
     /** Acceptor of the result. */
     private final BiConsumer<? super String, ? super String> result;
@@ -108,15 +108,13 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
     }
 
     /**
-     * Tests if the given class may be passed to {@link #add(Class)}.
+     * Tests if the given class may be passed to {@link #inspect(Class)}.
      *
      * @param clazz
      *            the class to test. It must not be {@code null}.
      *
      * @return {@code true} if the class is properly annotated and supports the
      *         expected format(s)
-     *
-     * @see java.util.function.Predicate#test(java.lang.Object)
      */
     public boolean test(Class<?> clazz) {
         final ResourceStockpile stockpile = clazz.getAnnotation(ResourceStockpile.class);
@@ -124,12 +122,12 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
     }
 
     /**
-     * This method is an alias for {@link #add(Class)}.
+     * This method is an alias for {@link #inspect(Class)}.
      *
      * @see java.util.function.Consumer#accept(java.lang.Object)
      */
     public void accept(Class<?> clazz) {
-        add(clazz);
+        inspect(clazz);
     }
 
     /**
@@ -141,7 +139,7 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
      *
      * @return this instance
      */
-    public ResourceDiscovery add(Class<?> clazz) {
+    public ResourceDiscovery inspect(Class<?> clazz) {
         if (!test(clazz)) {
             throw new IllegalArgumentException(clazz.toString());
         }
@@ -152,23 +150,23 @@ public final class ResourceDiscovery implements Predicate<Class<?>>, Consumer<Cl
         Stream.of(clazz.getFields()).filter(field -> {
             final int modifiers = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
             return (field.getModifiers() & modifiers) == modifiers;
-        }).forEach(field -> add(field, acc));
+        }).forEach(field -> process(field, acc));
 
         return this;
     }
 
     /**
-     * Adds the resource defined by the given field
+     * Processes the resource defined by the given field
      *
      * @param field
-     *            the field to inspect. It must not be {@code null} and it must
+     *            the field to process. It must not be {@code null} and it must
      *            be accessible with the current lookup, properly annotated and
      *            formatted.
      * @param acc
      *            the {@link AccessControlContext} for adding the field if not
      *            using the lookup object. It must not be {@code null}.
      */
-    private void add(Field field, AccessControlContext acc) {
+    private void process(Field field, AccessControlContext acc) {
         assert (acc != null);
 
         final ResourceString definition = field.getAnnotation(ResourceString.class);
