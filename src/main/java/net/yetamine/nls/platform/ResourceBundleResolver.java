@@ -16,11 +16,13 @@
 
 package net.yetamine.nls.platform;
 
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
+import net.yetamine.nls.MessageTemplate;
 import net.yetamine.nls.ResourcePackage;
 
 /**
@@ -100,6 +102,13 @@ final class ResourceBundleResolver implements ResourcePackage {
     @SuppressWarnings("unchecked")
     public <T> T object(String identifier) {
         return (T) loader.load(name(), locale()).getObject(identifier);
+    }
+
+    /**
+     * @see net.yetamine.nls.ResourceProvider#message(java.lang.String)
+     */
+    public MessageTemplate message(String identifier) {
+        return args -> new MessageFormat(string(identifier), locale()).format(args);
     }
 
     /**

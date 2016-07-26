@@ -16,9 +16,11 @@
 
 package net.yetamine.nls.platform;
 
+import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import net.yetamine.nls.MessageTemplate;
 import net.yetamine.nls.ResourceProvider;
 
 /**
@@ -67,6 +69,13 @@ final class ResourceBundleAdapter implements ResourceProvider {
     @SuppressWarnings("unchecked")
     public <T> T object(String name) {
         return (T) bundle.getObject(name);
+    }
+
+    /**
+     * @see net.yetamine.nls.ResourceProvider#message(java.lang.String)
+     */
+    public MessageTemplate message(String name) {
+        return args -> new MessageFormat(string(name), bundle.getLocale()).format(args);
     }
 
     /**

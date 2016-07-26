@@ -247,9 +247,7 @@ public interface ResourceProvider {
      * @throws MissingResourceException
      *             if the resource could not be found
      */
-    default MessageTemplate message(String name) {
-        return args -> MessageFormat.format(string(name), args);
-    }
+    MessageTemplate message(String name);
 
     // Resource context support
 
