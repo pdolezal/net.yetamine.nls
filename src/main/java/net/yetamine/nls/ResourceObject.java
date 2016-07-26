@@ -175,8 +175,8 @@ final class DefaultResourceObject<T> implements ResourceObject<T> {
     /**
      * @see net.yetamine.nls.ResourceObject#use(net.yetamine.nls.ResourceProvider)
      */
+    @SuppressWarnings("unchecked")
     public T use(ResourceProvider resources) {
-        final T result = resources.object(name());
-        return (result != null) ? result : fallback.apply(resources);
+        return resources.lookup(name()).map(o -> (T) o).orElseGet(() -> fallback.apply(resources));
     }
 }
