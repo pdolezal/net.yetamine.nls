@@ -89,9 +89,21 @@ public final class ResourceBinding<T> implements Function<Locale, T> {
      * @param locale
      *            the locale to switch to. It must not be {@code null}.
      *
-     * @return a new instance using a different locale.
+     * @return a new instance using a different locale
      */
     public ResourceBinding<T> locale(Locale locale) {
         return new ResourceBinding<>(source.locale(locale), resolver);
+    }
+
+    /**
+     * Provides a new instance using a different source.
+     *
+     * @param provider
+     *            the source to switch to. It must not be {@code null}.
+     *
+     * @return a new instance using a different source
+     */
+    public ResourceBinding<T> rebind(ResourcePackage provider) {
+        return new ResourceBinding<>(provider, resolver);
     }
 }
